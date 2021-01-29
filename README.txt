@@ -2,25 +2,25 @@
 Civic engagement tool to connect voters to the legislation that matters to them most in real-time.
 
 
-Project Proposal: LegislatR
+# Project Proposal: LegislatR
 
 
-1. What goal will your website be designed to achieve?
-   1. The goal of this website will assist in political outreach. It is becoming increasingly more important, especially in 2021, for younger voters to be more politically active. The impact of young voters was obvious in the 2020 presidential race between Donald Trump and Joseph Biden, but this level of participation can have a substantial impact on other areas of the legislation. There is a significant lack of awareness of the importance of local government and the direct impact local laws have on our day-to-day lives. If we can promote legislative visibility in young voters by bringing them closer to the source, we can change the landscape of our politics forever. 
+- What goal will your website be designed to achieve?
+   - The goal of this website will assist in political outreach. It is becoming increasingly more important, especially in 2021, for younger voters to be more politically active. The impact of young voters was obvious in the 2020 presidential race between Donald Trump and Joseph Biden, but this level of participation can have a substantial impact on other areas of the legislation. There is a significant lack of awareness of the importance of local government and the direct impact local laws have on our day-to-day lives. If we can promote legislative visibility in young voters by bringing them closer to the source, we can change the landscape of our politics forever. 
 
 
-2. What kind of users will visit your site? In other words, what is the demographic of your users?
-   1. I expect that this website will attract those young voters between the ages of 18-35 who already have an interest in participating in American political discourse. This app is not designed to make people interested; It is designed to connect those who are already interested in politics to the legislation that should matter to them most. 
+- What kind of users will visit your site? In other words, what is the demographic of your users?
+   - I expect that this website will attract those young voters between the ages of 18-35 who already have an interest in participating in American political discourse. This app is not designed to make people interested; It is designed to connect those who are already interested in politics to the legislation that should matter to them most. 
 
 
-3. What data do you plan on using? You may not have picked your actual API yet, which is fine, just outline what kind of data you will like it to contain.
-   1. This application will include judicial information from several different levels of government: National, State, County, and City laws being passed. This app will also gather location/preference data from the users, and use that information to connect them to the legislation that would matter most to them, regardless of political ideology. Phone number information will also be collected in order to implement a notification system via text into the application, as is shown that texting is a highly effective method of reaching younger voters. 
-   2. API’s
-      1. https://api.data.gov/ - For agency data / related federal acts/regulations by department (single API key for access to all)
-      2. https://datausa.io/about/api/ - Census information by region. Helps with state/demographic drill-downs
-      3. https://civicdata.usvotefoundation.org/ - Repository for Civic Data
-      4. https://developers.google.com/civic-information - Google’s Civic Data API with location drill-down and ability to see who is representing a user’s district
-      5. https://www.twilio.com/sms - SMS Texting API for alerts
+- What data do you plan on using? You may not have picked your actual API yet, which is fine, just outline what kind of data you will like it to contain.
+   - This application will include judicial information from several different levels of government: National, State, County, and City laws being passed. This app will also gather location/preference data from the users, and use that information to connect them to the legislation that would matter most to them, regardless of political ideology. Phone number information will also be collected in order to implement a notification system via text into the application, as is shown that texting is a highly effective method of reaching younger voters. 
+   - API’s
+      - [api.data.gov](https://api.data.gov/) - For agency data / related federal acts/regulations by department (single API key for access to all)
+      - [datausa](https://datausa.io/about/api/) - Census information by region. Helps with state/demographic drill-downs
+      - [civicdata](https://civicdata.usvotefoundation.org/) - Repository for Civic Data
+      - [google civic information API](https://developers.google.com/civic-information) - Google’s Civic Data API with location drill-down and ability to see who is representing a user’s district
+      5. [twilio](https://www.twilio.com/sms) - SMS Texting API for alerts
  
 4. In brief, outline your approach to creating your project (knowing that you may not know everything in advance and that these details might change later). Answer questions like the ones below, but feel free to add more information: 
    1. What does your database schema look like?
