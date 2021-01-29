@@ -20,31 +20,39 @@ Civic engagement tool to connect voters to the legislation that matters to them 
       - [datausa](https://datausa.io/about/api/) - Census information by region. Helps with state/demographic drill-downs
       - [civicdata](https://civicdata.usvotefoundation.org/) - Repository for Civic Data
       - [google civic information API](https://developers.google.com/civic-information) - Google’s Civic Data API with location drill-down and ability to see who is representing a user’s district
-      5. [twilio](https://www.twilio.com/sms) - SMS Texting API for alerts
+      - [twilio](https://www.twilio.com/sms) - SMS Texting API for alerts
  
-4. In brief, outline your approach to creating your project (knowing that you may not know everything in advance and that these details might change later). Answer questions like the ones below, but feel free to add more information: 
-   1. What does your database schema look like?
-      1. Users
-         1. Username
-         2. Location
-         3. Phone number
-         4. Email address
-         5. Hashed password
-         6. Saved laws
-         7. Representatives
-         8. Senators
-         9. Mayor
-         10. Governor
-         11. Council Members
-      2. Everything else will be gathered from the API. Haven’t yet decided if the information from the API is going to be stored in my own Database or if I should just fetch the data. It’ll be a lot of data, and I’m not looking to pay for server storage, so I think I might just stick with fetching / parsing the information from the various API’s
-   2. What kinds of issues might you run into with your API?
-      1. No phone number verification (No way to prevent doxing someone with text messages)
-      2. Invalid addresses/area codes (Will need to handle an invalid address return from the APIs)
-      3. No email verification setup (No way to verify/validate an email within the scope of this course)
-   3. Is there any sensitive information you need to secure?
-      1. I think it would be wise to completely secure all personally identifiable information on the site. There’s no need for it to be used by an outside source. All API calls should be authenticated, and no user should be able to access another user’s demographic information. 
-   4. What functionality will your app include?
-      1. The primary function will primarily be a drill-down formula to help navigate relevant laws/bills, as well as a full-search functionality to look for bills/laws being passed/voted on in other areas of the country. 
-   5. What will the user flow look like?
-   6. What features make your site more than CRUD? Do you have any stretch goals?
-      1. This app is not only a sorting machine for civic information. It will entail elements of text notification and follow/liking of users and civic information.
+- In brief, outline your approach to creating your project (knowing that you may not know everything in advance and that these details might change later). Answer questions like the ones below, but feel free to add more information: 
+   - What does your database schema look like?
+      - Users
+         - Username
+         - Location
+         - Phone number
+         - Email address
+         - Hashed password
+         - Saved laws
+         - Representatives
+         - Senators
+         - Mayor
+         - Governor
+         - Council Members
+      - Everything else will be gathered from the API. Haven’t yet decided if the information from the API is going to be stored in my own Database or if I should just fetch the data. It’ll be a lot of data, and I’m not looking to pay for server storage, so I think I might just stick with fetching / parsing the information from the various API’s
+   - What kinds of issues might you run into with your API?
+      - No phone number verification (No way to prevent doxing someone with text messages)
+      - Invalid addresses/area codes (Will need to handle an invalid address return from the APIs)
+      - No email verification setup (No way to verify/validate an email within the scope of this course)
+   - Is there any sensitive information you need to secure?
+      - I think it would be wise to completely secure all personally identifiable information on the site. There’s no need for it to be used by an outside source. All API calls should be authenticated, and no user should be able to access another user’s demographic information. 
+   - What functionality will your app include?
+      - The primary function will primarily be a drill-down formula to help navigate relevant laws/bills, as well as a full-search functionality to look for bills/laws being passed/voted on in other areas of the country. 
+   - What will the user flow look like?
+      - Register > Login > Homepage -->
+         -Homepage contains links to three separate things:
+            -Who the user is following
+               -When viewing another users page, you'll be able to see who the legislation/people they are following as well as comments they've made about specific legislation
+            -What legislation the user is tracking
+               -This page will display comments/activity regarding the specific piece of legislation, and any PAC donations to any politicians in support or defiance of the specific article
+               -Will contain a forum/chatroom functionality for people to discuss the specific legislation (potentially)
+            -Who is following the user
+   - What features make your site more than CRUD? Do you have any stretch goals?
+      - This app is not only a sorting machine for civic information. It will entail elements of text notification and follow/liking of users and civic information.
