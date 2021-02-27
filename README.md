@@ -20,6 +20,7 @@ Civic engagement tool to connect voters to the legislation that matters to them 
       - [datausa](https://datausa.io/about/api/) - Census information by region. Helps with state/demographic drill-downs
       - [civicdata](https://civicdata.usvotefoundation.org/) - Repository for Civic Data
       - [google civic information API](https://developers.google.com/civic-information) - Google’s Civic Data API with location drill-down and ability to see who is representing a user’s district
+      - [openstates.org](https://v3.openstates.org/docs) - For state jurisdictions/people/bills
       - [twilio](https://www.twilio.com/sms) - SMS Texting API for alerts
  
 - In brief, outline your approach to creating your project (knowing that you may not know everything in advance and that these details might change later). Answer questions like the ones below, but feel free to add more information: 
