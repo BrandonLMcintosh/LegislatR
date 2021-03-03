@@ -1,0 +1,26 @@
+Main:
+ 
+/ -> /user/signup
+
+/user/ -> /user/home
+/user/login
+/user/logout
+/user/signup
+/user/home
+
+/bills -> /bills/list
+/bills/list
+/bills/<bill>
+/bills/<bill>/like
+/bills/<bill>/sponsors
+
+/states -> /states/list
+/states/list
+/states/<state>
+/states/<state>/bills
+/state/<state>/politicians
+/state/<state>/senators
+/state/<state>/representatives
+
+/politician -> /politician/sponsorships
+/politician/sponsorships
