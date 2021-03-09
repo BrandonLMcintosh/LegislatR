@@ -9,6 +9,4 @@ class Party(db.Model):
 
     name = db.Column(db.Text, nullable=False)
 
-    senators = db.relationship('Senator')
-
-    representatives = db.relationship('Representative')
+    politicians = db.relationship('Politician', secondary='parties_politicians')

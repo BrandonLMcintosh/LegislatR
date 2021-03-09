@@ -9,3 +9,9 @@ class State(db.Model):
     name = db.Column(db.Text, nullable=False)
 
     users = db.relationship('User')
+    
+    politicians = db.relationship('Politician')
+
+    bills = db.relationship('Bill')
+
+    users = db.relationship('User')

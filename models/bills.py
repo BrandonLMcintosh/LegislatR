@@ -15,3 +15,10 @@ class Bill(db.Model):
 
     state = db.relationship('State')
 
+    tags = db.relationship('Tag', secondary='bills_tags')
+
+    users_following = db.relationship('User', secondary='bills_users')
+
+    sponsors = db.relationship('Politician', secondary='bills_politicians')
+
+    comments = db.relationship('Comment')
