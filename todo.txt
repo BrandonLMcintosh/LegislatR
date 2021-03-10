@@ -1,0 +1,4 @@
+Navbar Styling: 
+    -Scheme: Light blue, soft red accents
+    -change search color
+
