@@ -25,18 +25,7 @@ Civic engagement tool to connect voters to the legislation that matters to them 
  
 - In brief, outline your approach to creating your project (knowing that you may not know everything in advance and that these details might change later). Answer questions like the ones below, but feel free to add more information: 
    - What does your database schema look like?
-      - Users
-         - Username
-         - Location
-         - Phone number
-         - Email address
-         - Hashed password
-         - Saved laws
-         - Representatives
-         - Senators
-         - Mayor
-         - Governor
-         - Council Members
+      - ![schema](https://imgur.com/a/sx0BerV)
       - Everything else will be gathered from the API. Haven’t yet decided if the information from the API is going to be stored in my own Database or if I should just fetch the data. It’ll be a lot of data, and I’m not looking to pay for server storage, so I think I might just stick with fetching / parsing the information from the various API’s
    - What kinds of issues might you run into with your API?
       - No phone number verification (No way to prevent doxing someone with text messages)
