@@ -24,6 +24,7 @@ app.register_blueprint(users, url_prefix="/user")
 app.register_blueprint(states, url_prefix="/states")
 app.register_blueprint(politicians, url_prefix="/politicians")
 
+
 @app.route('/')
 def index():
     return render_template('index.html')

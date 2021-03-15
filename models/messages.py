@@ -1,8 +1,9 @@
 from connect_db import db
 
+
 class Message(db.Model):
     """Message"""
-    
+
     __tablename__ = 'messages'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)

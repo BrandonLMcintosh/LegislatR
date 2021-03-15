@@ -1,5 +1,6 @@
 from connect_db import db
 
+
 class Tag(db.Model):
     """Tag"""
 

@@ -1,5 +1,6 @@
 from connect_db import db
 
+
 class BillTag(db.Model):
     """BillTag"""
 

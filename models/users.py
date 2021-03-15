@@ -1,5 +1,6 @@
 from connect_db import db
 
+
 class User(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)

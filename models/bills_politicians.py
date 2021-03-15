@@ -1,5 +1,6 @@
 from connect_db import db
 
+
 class BillPolitician(db.Model):
     """BillPolitician"""
 
@@ -7,4 +8,5 @@ class BillPolitician(db.Model):
 
     bill_id = db.Column(db.Integer, db.ForeignKey('Bill'), primary_key=True)
 
-    politician_id = db.Column(db.Integer, db.ForeignKey('Politician'), primary_key=True)
+    politician_id = db.Column(
+        db.Integer, db.ForeignKey('Politician'), primary_key=True)

@@ -1,8 +1,9 @@
 from connect_db import db
 
+
 class Comment(db.Model):
     """Comment"""
-    
+
     __tablename__ = 'comments'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)

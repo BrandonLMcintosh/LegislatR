@@ -1,5 +1,6 @@
 from connect_db import db
 
+
 class Party(db.Model):
     """Political Party"""
 
@@ -9,4 +10,5 @@ class Party(db.Model):
 
     name = db.Column(db.Text, nullable=False)
 
-    politicians = db.relationship('Politician', secondary='parties_politicians')
+    politicians = db.relationship(
+        'Politician', secondary='parties_politicians')
