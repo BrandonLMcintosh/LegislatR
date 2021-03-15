@@ -1,2 +1,6 @@
+-Infinite, auto-populating scrollable columns
+-Fix auto-column sizing
+-prevent column header click events when column is expanded
+-implement search bar with results for bills / states / tags
 
 

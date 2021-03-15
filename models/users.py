@@ -1,4 +1,7 @@
 from connect_db import db
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
 
 
 class User(db.Model):
@@ -26,19 +29,39 @@ class User(db.Model):
     liked_comments = db.relationship('Comment', secondary='comments_likes')
 
     @staticmethod
-    def follow_bill(self):
+    def toggle_follow_bill(self):
         pass
 
     @staticmethod
-    def follow_tag(self):
+    def toggle_follow_tag(self):
         pass
 
     @staticmethod
-    def edit_profile(self):
+    def comment(self):
         pass
 
     @classmethod
-    def signup(self):
+    def login(cls, username, password):
+        result = {}
+        user = User.query.filter_by(username=username).first()
+        if user:
+            if bcrypt.check_password_hash(user.password, password):
+                result['data'] = {
+                    'username': user.username,
+                    'state': user.state,
+                    'tags_following': user.tags_following,
+                    'bills_following': user.bills_following,
+                    'messages': user.messages,
+                    'comments': user.comments,
+                    'liked_comments': user.liked_comments}
+                return result
+            result['data'] = {'error': 'Incorrect username / password'}
+            return result
+        result['data'] = {'error': 'That username does not exist'}
+        return result
+
+    @classmethod
+    def register(cls):
         pass
 
     @classmethod

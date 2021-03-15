@@ -18,3 +18,10 @@ def register():
 @users.route('/logout', methods=["GET"])
 def logout():
     return "logout"
+
+
+@users.route('/<int:user_id>', methods=["GET"])
+def get(user_id):
+    if session.user.id == user_id:
+        return User.get(user_id)
+    return ""
