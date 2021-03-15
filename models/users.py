@@ -8,7 +8,7 @@ class User(db.Model):
 
     password = db.Column(db.Text, nullable=False)
 
-    phone = db.Column(db.Number, nullable=False)
+    phone = db.Column(db.Integer, nullable=False)
 
     state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
 

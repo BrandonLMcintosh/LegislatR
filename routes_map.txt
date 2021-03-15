@@ -14,7 +14,6 @@ Main:
 /bills/<bill>
 /bills/<bill>/like
 /bills/<bill>/comment
-/bills/<bill>/
 /bills/<bill>/sponsors
 
 /states -> /states/list

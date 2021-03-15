@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+      integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pathway+Gothic+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <title>LGSLTR</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">LGSLTR</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#home" id="nav-home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#states" id="nav-states">States</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#bills" id="nav-bills">Bills</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#account" id="nav-account">Account</a>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-light" type="submit" id="nav-search">
+              Search
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div id="page-content">
+      <div id="home"></div>
+      <div id="bills" class="flex-container">
+        <div id="bills-following" class="flex-column">
+          <div id="bills-following-header" class="flex-column-header">
+            <i class="fas fa-angle-left flex-column-back invisible"></i>
+            <h3>following</h3>
+          </div>
+        </div>
+        <div id="bills-state" class="flex-column">
+          <div id="bills-state-header" class="flex-column-header">
+            <i class="fas fa-angle-left flex-column-back invisible"></i>
+            <h3>state</h3>
+          </div>
+        </div>
+        <div id="bills-tags" class="flex-column">
+          <div id="bills-tags-header" class="flex-column-header">
+            <i class="fas fa-angle-left flex-column-back invisible"></i>
+            <h3>tags</h3>
+          </div>
+        </div>
+      </div>
+      <div id="states" class="flex-container">
+        <div id="states-list" class="flex-column">
+          <h3 class="flex-column-header">States</h3>
+          <div class="flex-column-item"></div>
+        </div>
+        <div id="states-info" class="flex-column">
+          <h3 class="flex-column-header">Info</h3>
+        </div>
+      </div>
+      <div id="account"></div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/BrandonLMcintosh/LGSLTR">
+        <i class="fab fa-github"></i>
+      </a>
+      <a href="https://twitter.com/The_Art_Of_Mack">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </footer>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
