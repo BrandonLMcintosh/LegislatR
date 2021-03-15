@@ -61,17 +61,72 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  //account page
-
-  //home page
-
   loadPage();
 });
 
-function Page() {}
+function Page(columns) {
+  this.columns = columns;
+  this.update = async function () {};
+}
 
 function Column() {}
 
-function bill() {}
+function Bill(dbID, body, state, tags, sponsors, comments) {
+  this.dbID = dbID;
+  this.body = body;
+  this.state = state;
+  this.tags = tags;
+  this.sponsors = sponsors;
+  this.comments = comments;
+  this.update = async function () {
+    return;
+  };
+}
 
-function state() {}
+function State(dbID, code, bills, politicians) {
+  this.dbID = dbID;
+  this.code = code;
+  this.bills = bills;
+  this.politicians = politicians;
+  this.update = async function () {
+    return;
+  };
+}
+
+function Tag(dbID, bills) {
+  this.dbID = dbID;
+  this.bills = bills;
+  this.update = async function () {};
+}
+
+function Politician(dbID, fullName, state, sponsoredBills, senator) {
+  this.dbID = dbID;
+  this.fullName = fullName;
+  this.state = state;
+  this.sponsoredBills = sponsoredBills;
+  this.senator = senator;
+  this.update = async function () {
+    return;
+  };
+}
+
+function User(dbID, username, phone, state, tags, bills, comments) {
+  this.dbID = dbID;
+  this.username = username;
+  this.phone = phone;
+  this.state = state;
+  this.tags = tags;
+  this.bills = bills;
+  this.comments = comments;
+  this.update = async function () {
+    return;
+  };
+}
+
+//process login
+const localStorage = window.localStorage;
+if (localStorage.getItem("user")) {
+  loadPage("#bills");
+} else {
+  loadPage("#account");
+}
