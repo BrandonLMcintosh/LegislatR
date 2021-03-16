@@ -7,21 +7,34 @@ users = Blueprint("users", __name__, static_folder="static",
 
 @users.route('/login', methods=["POST"])
 def login():
-    return 'login'
+
+    data = request.get_json()
+
+    username = data['username']
+    password = data['password']
+
+    return User.login(username, password)
 
 
 @users.route('/register', methods=["POST"])
 def register():
-    return "register"
+
+    data = request.get_json()
+
+    username = data['username']
+    password = data['password']
+    phone = data['phone']
+    state = data['state']
+    tags = data['tags'] or []
+
+    return User.register(username, password, phone, state, tags)
 
 
 @users.route('/logout', methods=["GET"])
 def logout():
-    return "logout"
+    return User.logout()
 
 
 @users.route('/<int:user_id>', methods=["GET"])
 def get(user_id):
-    if session.user.id == user_id:
-        return User.get(user_id)
-    return ""
+    User.get(session)

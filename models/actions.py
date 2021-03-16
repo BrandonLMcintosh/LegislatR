@@ -1,4 +1,5 @@
 from connect_db import db
+from flask import jsonify
 
 
 class Action(db.Model):

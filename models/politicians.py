@@ -1,4 +1,5 @@
 from connect_db import db
+from flask import json, jsonify
 
 
 class Politician(db.Model):
@@ -29,3 +30,16 @@ class Politician(db.Model):
     @property
     def full_name(self):
         return self.first_name + self.last_name
+
+    @property
+    def data(self):
+        data = {
+            'full_name': self.full_name,
+            'senator': self.senator,
+            'party': self.party,
+            'state': self.state,
+            'sponsored_bills': self.sponsored_bills
+        }
+
+        response = jsonify(data)
+        return response

@@ -1,4 +1,5 @@
 from connect_db import db
+from flask import jsonify
 
 
 class Bill(db.Model):
@@ -24,3 +25,9 @@ class Bill(db.Model):
     sponsors = db.relationship('Politician', secondary='bills_politicians')
 
     comments = db.relationship('Comment')
+
+    @property
+    def data(self):
+        data = {
+            'title': self.title,
+        }
