@@ -23,9 +23,11 @@ class State(db.Model):
 
     users = db.relationship('User')
 
+
     @property
     def code(self):
         return self.division_id[-2:]
+
 
     @property
     def data(self):
@@ -36,19 +38,16 @@ class State(db.Model):
             'politicians': self.politicians,
             'bills': self.bills
         }
-
         response = jsonify(data)
         return response
 
+
     @classmethod
     def Generate_States(cls):
-
         response = requests.get(request_states)
         data = response.json()
         results = data['results']
-
         for state in results:
-
             division_id = state['division_id']
             code = state['division_id'][-2:]
             name = state['name']
@@ -59,7 +58,5 @@ class State(db.Model):
                 name=name,
                 url=url
             )
-
             db.session.add(new_state)
-
         db.session.commit()

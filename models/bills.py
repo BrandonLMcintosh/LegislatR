@@ -31,3 +31,8 @@ class Bill(db.Model):
         data = {
             'title': self.title,
         }
+
+    @classmethod
+    def get(cls, bill_id):
+        bill = cls.query.get(bill_id)
+        return bill

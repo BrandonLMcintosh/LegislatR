@@ -11,15 +11,16 @@ class Comment(db.Model):
 
     text = db.Column(db.Text, nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('User'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User'), nullable=False)
 
     user = db.relationship('User')
 
-    bill_id = db.Column(db.Integer, db.ForeignKey('Bill'))
+    bill_id = db.Column(db.Integer, db.ForeignKey('Bill'), nullable=False)
 
     bill = db.relationship('Bill')
 
     likes = db.relationship('User', secondary='comments_likes')
+
 
     @property
     def data(self):
@@ -32,3 +33,10 @@ class Comment(db.Model):
 
         response = jsonify(data)
         return response
+
+
+    @classmethod
+    def get(cls, user_id, text, bill_id):
+        comment = cls.query.filter_by(user_id=user_id, text=text, bill_id=bill_id).first()
+        return comment
+
