@@ -1,5 +1,6 @@
 from flask import Flask, render_template
-from connect_db import connect_db
+from models_shared import db
+from models.states import State
 
 from keys import secret_key
 from routes.bills import bills
@@ -10,14 +11,18 @@ from routes.politicians import politicians
 
 app = Flask(__name__)
 
+db.app = app
+db.init_app(app)
+
+db.drop_all()
+db.create_all()
+
+State.Generate_States()
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///LGSLTR'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = secret_key
-
-
-connect_db(app)
 
 
 app.register_blueprint(bills, url_prefix="/bills")

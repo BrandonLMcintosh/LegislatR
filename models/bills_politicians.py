@@ -1,12 +1,13 @@
-from connect_db import db
+from models_shared import db
 
 
 class BillPolitician(db.Model):
     """BillPolitician"""
 
-    __tablename__ = 'bills_politician'
+    __tablename__ = 'bills_politicians'
 
-    bill_id = db.Column(db.Integer, db.ForeignKey('Bill'), primary_key=True)
+    bill_id = db.Column(db.Integer, db.ForeignKey(
+        'bills.id'), primary_key=True)
 
     politician_id = db.Column(
-        db.Integer, db.ForeignKey('Politician'), primary_key=True)
+        db.Integer, db.ForeignKey('politicians.id'), primary_key=True)

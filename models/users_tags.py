@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 
 
 class UserTag(db.Model):
@@ -6,6 +6,7 @@ class UserTag(db.Model):
 
     __tablename__ = 'users_tags'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('User'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), primary_key=True)
 
-    tag_id = db.Column(db.Integer, db.ForeignKey('Tag'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)

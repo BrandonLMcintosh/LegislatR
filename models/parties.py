@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 
 
 class Party(db.Model):
@@ -10,5 +10,15 @@ class Party(db.Model):
 
     name = db.Column(db.Text, nullable=False)
 
-    politicians = db.relationship(
-        'Politician', secondary='parties_politicians')
+    @property
+    def data(self):
+        data = {
+            'db_id': self.id,
+            'name': self.name,
+            'politicians': self.politicians
+        }
+
+    @classmethod
+    def get(cls, party_name):
+        party = cls.query.filter_by(name=party_name).first()
+        return party

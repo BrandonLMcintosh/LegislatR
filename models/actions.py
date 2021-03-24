@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 from flask import jsonify
 
 
@@ -13,4 +13,18 @@ class Action(db.Model):
     date = db.Column(db.Date, nullable=False)
     bill_id = db.Column(db.Integer, db.ForeignKey(
         'bills.id'), nullable=False)
-    bill = db.relationship("Bill")
+
+    @property
+    def data(self):
+        data = {
+            'db_id': self.id,
+            'organization': self.organization,
+            'description': self.description,
+            'date': self.date,
+            'bill': self.bill
+        }
+
+    @classmethod
+    def get(cls, action_id):
+        action = cls.query.get(action_id)
+        return action

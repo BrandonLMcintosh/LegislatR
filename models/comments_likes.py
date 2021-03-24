@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 
 
 class CommentLike(db.Model):
@@ -7,6 +7,7 @@ class CommentLike(db.Model):
     __tablename__ = 'comments_likes'
 
     comment_id = db.Column(
-        db.Integer, db.ForeignKey('Comment'), primary_key=True)
+        db.Integer, db.ForeignKey('comments.id'), primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('User'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), primary_key=True)

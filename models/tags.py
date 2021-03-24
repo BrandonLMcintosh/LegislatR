@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 from flask import jsonify
 
 
@@ -11,13 +11,14 @@ class Tag(db.Model):
 
     name = db.Column(db.String(15), nullable=False)
 
-    users_following = db.relationship('User', secondary='users_tags')
-
-    bills_tagged = db.relationship('Bill', secondary='bills_tags')
-
     @property
     def data(self):
         data = {
             'name': self.name,
             'bills_tagged': self.bills_tagged
         }
+
+    @classmethod
+    def get(cls, tag_id):
+        tag = cls.query.get(tag_id)
+        return tag

@@ -18,7 +18,6 @@ def login():
 
 @users.route('/register', methods=["POST"])
 def register():
-
     data = request.get_json()
 
     username = data['username']

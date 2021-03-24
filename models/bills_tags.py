@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 
 
 class BillTag(db.Model):
@@ -6,6 +6,7 @@ class BillTag(db.Model):
 
     __tablename__ = 'bills_tags'
 
-    bill_id = db.Column(db.Integer, db.ForeignKey('Bill'), primary_key=True)
+    bill_id = db.Column(db.Integer, db.ForeignKey(
+        'bills.id'), primary_key=True)
 
-    tag_id = db.Column(db.Integer, db.ForeignKey('Tag'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)

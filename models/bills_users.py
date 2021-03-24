@@ -1,4 +1,4 @@
-from connect_db import db
+from models_shared import db
 
 
 class BillUser(db.Model):
@@ -6,6 +6,8 @@ class BillUser(db.Model):
 
     __tablename__ = 'bills_users'
 
-    bill_id = db.Column(db.Integer, db.ForeignKey('Bill'), primary_key=True)
+    bill_id = db.Column(db.Integer, db.ForeignKey(
+        'bills.id'), primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('User'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), primary_key=True)
