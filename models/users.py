@@ -87,7 +87,7 @@ class User(db.Model):
             return jsonify(result)
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf8')
-        existing_state = State.query.filter_by(code=state_code).first()
+        existing_state = State.get(state_code)
         state_id = existing_state.id
         user = cls(
             username=username,
@@ -96,7 +96,7 @@ class User(db.Model):
             state_id=state_id)
         db.session.add(user)
         db.session.commit()
-        new_user = cls.query.filter_by(username=username).first()
+        new_user = cls.get(username)
         session['user'] = new_user
         result['data'] = {'registered': f'successfully registered {username}'}
         return jsonify(result)

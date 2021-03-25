@@ -38,6 +38,11 @@ class State(db.Model):
         return response
 
     @classmethod
+    def get(cls, state_code):
+        state = cls.query.filter_by(code=state_code).first()
+        return state
+
+    @classmethod
     def get_all(cls):
         states = cls.query.all()
         response = {}
