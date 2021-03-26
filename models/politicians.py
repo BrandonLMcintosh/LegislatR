@@ -10,13 +10,11 @@ class Politician(db.Model):
 
     __tablename__ = 'politicians'
 
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Text, primary_key=True, nullable=False)
 
-    os_id = db.Column(db.Text, nullable=False)
+    first_name = db.Column(db.Text)
 
-    first_name = db.Column(db.Text, nullable=False)
-
-    last_name = db.Column(db.Text, nullable=False)
+    last_name = db.Column(db.Text)
 
     title = db.Column(db.Text, nullable=False)
 
@@ -41,6 +39,7 @@ class Politician(db.Model):
     @property
     def data(self):
         data = {
+            'os_id': self.os_id,
             'full_name': self.full_name,
             'title': self.title,
             'party': self.party,
@@ -52,9 +51,29 @@ class Politician(db.Model):
         return response
 
     @classmethod
-    def get(cls, id):
-        politician = cls.query.get_or_404(id)
-        return politician
+    def get(cls, os_id):
+        politician = cls.query.filter_by(os_id=os_id).first()
+        if politician:
+            return politician
+        Politician.grab(os_id)
+        return cls.get(os_id)
+
+    @classmethod
+    def grab(cls, os_id):
+        response = requests.get(request_politician.substitute(os_id=os_id))
+        data = response.json()
+        results = data['result']
+        first_name = results['given_name']
+        last_name = results['family_name']
+        title = results['current_role']['title']
+        email = results['email']
+        image = results['image']
+        party = results['party']
+        politician = cls(os_id=os_id, first_name=first_name,
+                         last_name=last_name, title=title, email=email, image=image)
+        politician.add_party(party)
+        db.session.add(politician)
+        db.session.commit()
 
     def update(self):
         response = requests.get(
@@ -63,6 +82,7 @@ class Politician(db.Model):
         results = data['result']
         self.first_name = results['given_name']
         self.last_name = results['family_name']
+        self.title = results['current_role']['title']
         self.email = results['email']
         self.image = results['image']
 

@@ -6,8 +6,10 @@ class BillPolitician(db.Model):
 
     __tablename__ = 'bills_politicians'
 
-    bill_id = db.Column(db.Integer, db.ForeignKey(
+    bill_id = db.Column(db.Text, db.ForeignKey(
         'bills.id'), primary_key=True)
 
     politician_id = db.Column(
         db.Integer, db.ForeignKey('politicians.id'), primary_key=True)
+
+    primary = db.Column(db.Boolean, nullable=False)

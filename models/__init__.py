@@ -1,1 +1,1 @@
-from models import actions, bills, bills_politicians, bills_tags, bills_users, comments, comments_likes, messages, parties, politicians, states, tags, users, users_tags
+from models import actions, bills, simple_bills_os_data, bills_politicians, bills_tags, bills_users, comments, comments_likes, messages, parties, politicians, simple_politicians_os_data, states, tags, users, users_tags

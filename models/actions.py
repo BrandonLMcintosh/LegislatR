@@ -11,15 +11,17 @@ class Action(db.Model):
     organization = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
     date = db.Column(db.Date, nullable=False)
-    bill_id = db.Column(db.Integer, db.ForeignKey(
+    order = db.Column(db.Integer, nullable=False)
+    bill_id = db.Column(db.Text, db.ForeignKey(
         'bills.id'), nullable=False)
 
     @property
     def data(self):
         data = {
-            'db_id': self.id,
+            'id': self.id,
             'organization': self.organization,
             'description': self.description,
+            'order': self.order,
             'date': self.date,
             'bill': self.bill
         }

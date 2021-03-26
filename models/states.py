@@ -1,10 +1,9 @@
-from models.politicians import Politician
 from models_shared import db
 import requests
+import re
 from flask import jsonify
 from keys import openstates
 from openstates_urls import request_states, request_state_bills
-import time
 
 
 openstates_key = openstates
@@ -15,29 +14,28 @@ class State(db.Model):
 
     __tablename__ = 'states'
 
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-
-    jurisdiction_id = db.Column(db.Text, nullable=False)
-
-    division_id = db.Column(db.Text, nullable=False)
+    id = db.Column(db.Text, primary_key=True, nullable=False)
 
     name = db.Column(db.Text, nullable=False)
 
-    url = db.Column(db.Text, nullable=False)
+    url = db.Column(db.Text)
 
     @property
     def code(self):
-        return self.division_id[-2:]
+        pattern = re.compile(r'(?<=state:)[a-z][a-z]')
+        match = pattern.search(self.jurisdiction_id)
+        code = match.group(0)
+        return code
 
     @property
     def data(self):
         data = {
-            'division_id': self.division_id,
+            'id': self.id,
             'code': self.code,
             'name': self.name,
             'politicians': self.politicians,
-            'bills': self.bills, 
-            'url':self.url
+            'bills': self.bills,
+            'url': self.url
         }
         return data
 
@@ -76,8 +74,7 @@ class State(db.Model):
         db.session.commit()
 
     def get_bills(self, page):
-        response = requests.get(request_state_bills.substitute(state_jurisdiction_id=self.jurisdiction_id, page=page))
+        response = requests.get(request_state_bills.substitute(
+            state_jurisdiction_id=self.jurisdiction_id, page=page))
         data = response.json()
         results = data['results']
-        
-        
