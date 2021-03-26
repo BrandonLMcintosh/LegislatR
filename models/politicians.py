@@ -69,11 +69,11 @@ class Politician(db.Model):
     def add_party(self, party_name):
         party = Party.get(party_name)
         if party:
-            self.party.append(party)
+            self.party = party
             return
         new_party = Party(name=party_name)
         db.session.add(new_party)
         db.session.commit()
         party = Party.get(party_name)
-        self.party.append(party)
+        self.party = party
         return

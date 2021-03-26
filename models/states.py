@@ -3,17 +3,21 @@ from models_shared import db
 import requests
 from flask import jsonify
 from keys import openstates
-from openstates_urls import request_states, request_state_politicians
+from openstates_urls import request_states, request_state_bills
+import time
 
 
 openstates_key = openstates
 
 
 class State(db.Model):
+    """State"""
 
     __tablename__ = 'states'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+
+    jurisdiction_id = db.Column(db.Text, nullable=False)
 
     division_id = db.Column(db.Text, nullable=False)
 
@@ -32,10 +36,10 @@ class State(db.Model):
             'code': self.code,
             'name': self.name,
             'politicians': self.politicians,
-            'bills': self.bills
+            'bills': self.bills, 
+            'url':self.url
         }
-        response = jsonify(data)
-        return response
+        return data
 
     @classmethod
     def get(cls, state_code):
@@ -68,33 +72,12 @@ class State(db.Model):
                     name=name,
                     url=url
                 )
-                new_state.get_politicians()
                 db.session.add(new_state)
         db.session.commit()
 
-    def get_politicians(self):
-        finished_parsing_last_page = True
-        current_page = 1
-        while finished_parsing_last_page == False:
-            response = requests.get(
-                request_state_politicians.substitute(state_name=self.name, page=current_page))
-            data = response.json()
-            results = data['results']
-            for politician in results:
-                first_name = politician['given_name']
-                last_name = politician['family_name']
-                party = politician['party']
-                title = politician['current_role']['title']
-                image = politician['image']
-                email = politician['email']
-                os_id = politician['id']
-                new_politician = Politician(
-                    first_name=first_name, last_name=last_name, title=title, image=image, email=email, state_id=self.id)
-                new_politician.add_party(party)
-                db.session.add(new_politician)
-
-            max_pages = data['pagination']['max_page']
-            if current_page == max_pages:
-                finished_parsing_last_page = True
-            current_page += 1
-        db.session.commit()
+    def get_bills(self, page):
+        response = requests.get(request_state_bills.substitute(state_jurisdiction_id=self.jurisdiction_id, page=page))
+        data = response.json()
+        results = data['results']
+        
+        

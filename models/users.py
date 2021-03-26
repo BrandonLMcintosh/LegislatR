@@ -10,7 +10,8 @@ bcrypt = Bcrypt()
 
 
 class User(db.Model):
-
+    """User"""
+    
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)

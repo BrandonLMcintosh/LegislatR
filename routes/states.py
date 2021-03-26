@@ -7,9 +7,10 @@ states = Blueprint("states", __name__, static_folder="static",
 
 @states.route("/list")
 def list():
-    return "list"
+    return State.get_all()
 
 
-@states.route('/<int:state_id>')
-def state(state_id):
-    return "state"
+@states.route('/<int:state_code>')
+def state(state_code):
+    state = State.get(state_code)
+    return state.data
