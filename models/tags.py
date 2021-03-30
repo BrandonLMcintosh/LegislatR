@@ -7,6 +7,9 @@ class Tag(db.Model):
 
     __tablename__ = 'tags'
 
+    def __repr__(self):
+        return self.data
+
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
     name = db.Column(db.String(15), nullable=False)

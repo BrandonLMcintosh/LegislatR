@@ -7,6 +7,9 @@ class Action(db.Model):
 
     __tablename__ = 'actions'
 
+    def __repr__(self):
+        return self.data
+
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     organization = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)

@@ -3,4 +3,6 @@
 -prevent column header click events when column is expanded
 -implement search bar with results for bills / states / tags
 
+-politician model update functions in same format as state/bills
+
 

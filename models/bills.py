@@ -3,7 +3,8 @@ from flask import json, jsonify
 from models.tags import Tag
 from models.actions import Action
 import requests
-from openstates_urls import request_bill, request_bill_sponsors
+from openstates_urls import request_bill
+from datetime import date
 
 
 class Bill(db.Model):
@@ -11,7 +12,14 @@ class Bill(db.Model):
 
     __tablename__ = 'bills'
 
+    def __repr__(self):
+        return self.data
+
     id = db.Column(db.Text, primary_key=True, nullable=False)
+
+    created_at = db.Column(db.DateTime, nullable=False)
+
+    updated_at = db.Column(db.DateTime, nullable=False)
 
     session = db.Column(db.Text, nullable=False)
 
@@ -23,15 +31,8 @@ class Bill(db.Model):
 
     url = db.Column(db.Text)
 
-    full = db.Column(db.Boolean, nullable=False, default=False)
-
     state_id = db.Column(db.Integer, db.ForeignKey(
         'states.id'), nullable=False)
-
-    simple_bill_id = db.Column(db.Text, db.ForeignKey('simple_bills.os_id'))
-
-    simple_politician_id = db.Column(
-        db.Text, db.ForeignKey('simple_politicians.os_id'))
 
     state = db.relationship('State', backref='bills')
 
@@ -44,6 +45,13 @@ class Bill(db.Model):
     actions = db.relationship('Action', backref='bill')
 
     comments = db.relationship('Comment', backref='bill')
+
+    @property
+    def updated(self):
+        days_since_update = date.today() - self.updated_at
+        if (days_since_update >= 1) or (not self.abstract):
+            return False
+        return True
 
     @property
     def data(self):
@@ -62,18 +70,18 @@ class Bill(db.Model):
     @classmethod
     def get(cls, os_id):
         bill = cls.query.filter_by(os_id=os_id).first()
-        if bill.full:
+        if bill.updated:
             return bill
-        bill.get_full()
+        bill.update()
         return bill
 
-    def get_full(self):
+    def request(self):
         response = requests.get(request_bill.substitute(id=self.id))
         data = response.json()
         result = data['result']
-        self.abstract = data['abstracts'][0]['abstract']
-        self.url = result['sources'][0]['url']
-        actions = result['actions']
+        return result
+
+    def add_actions(self, actions):
         for action in actions:
             organization = action['organization']['name']
             description = action['description']
@@ -82,7 +90,18 @@ class Bill(db.Model):
             new_action = Action(organization=organization,
                                 description=description, date=date, order=order, bill_id=self.id)
             db.session.add(new_action)
+        db.session.commit()
+    
+    def patch(self, result):
+        self.abstract = result['abstracts'][0]['abstract']
+        self.url = result['sources'][0]['url']
+        actions = result['actions']
+        self.add_actions(actions)
         self.full = True
+
+    def update(self):
+        result = self.request()
+        self.patch(result)
         db.session.add(self)
         db.session.commit()
 

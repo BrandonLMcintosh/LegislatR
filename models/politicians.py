@@ -3,12 +3,16 @@ from flask import json, jsonify
 from models.parties import Party
 import requests
 from openstates_urls import request_politician
+from datetime import date
 
 
 class Politician(db.Model):
     """Politician"""
 
     __tablename__ = 'politicians'
+
+    def __repr__(self):
+        return self.data
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
@@ -22,6 +26,8 @@ class Politician(db.Model):
 
     email = db.Column(db.Text, nullable=False)
 
+    updated_at = db.Column(db.DateTime, nullable=False, default=date.today())
+
     party_id = db.Column(db.Integer, db.ForeignKey(
         'parties.id'))
 
@@ -31,6 +37,10 @@ class Politician(db.Model):
         'states.id'), nullable=False)
 
     state = db.relationship('State', backref='politicians')
+
+    @property
+    def updated(self):
+
 
     @property
     def full_name(self):
@@ -51,33 +61,19 @@ class Politician(db.Model):
         return response
 
     @classmethod
-    def get(cls, os_id):
-        politician = cls.query.filter_by(os_id=os_id).first()
-        if politician:
+    def get(cls, id):
+        politician = cls.query.filter_by(id=id).first()
+        if politician.full:
             return politician
-        Politician.grab(os_id)
-        return cls.get(os_id)
+        politician.update()
+        return politician
 
-    @classmethod
-    def grab(cls, os_id):
-        response = requests.get(request_politician.substitute(os_id=os_id))
-        data = response.json()
-        results = data['result']
-        first_name = results['given_name']
-        last_name = results['family_name']
-        title = results['current_role']['title']
-        email = results['email']
-        image = results['image']
-        party = results['party']
-        politician = cls(os_id=os_id, first_name=first_name,
-                         last_name=last_name, title=title, email=email, image=image)
-        politician.add_party(party)
-        db.session.add(politician)
-        db.session.commit()
+    def request(self):
+        response = requests.get(request_politician.substitute(id=self.id))
 
     def update(self):
         response = requests.get(
-            request_politician.substitute(os_id=self.os_id))
+            request_politician.substitute(id=self.id))
         data = response.json()
         results = data['result']
         self.first_name = results['given_name']

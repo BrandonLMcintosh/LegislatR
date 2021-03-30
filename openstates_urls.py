@@ -16,20 +16,16 @@ query_page = 'page='
 query_id = 'id='
 
 
-request_states = Template(
-    f'{root}{route_jurisdiction}{query_classification}$classification&{key}')
+request_state = Template(f'{root}{route_jurisdiction}$id&{key}')
 
-request_state = Template(
-    f'{root}{route_jurisdiction}$state_juridisction_id&{key}')
+request_states = Template(
+    f'{root}{route_jurisdiction}{query_classification}state&{key}')
 
 request_state_bills = Template(
     f'{root}{route_jurisdiction}$state_name&{query_per_page}20&{query_page}$page&{key}')
 
-request_politician = Template(
-    f'{root}{route_people}{query_id}$os_id&{key}'
-)
+request_state_politicians = Template(f'{root}{route_people}{query_jurisdiction}$id&{key}')
 
-request_bill = Template(
-    f'{root}{route_bills}%id?include=sponsorships&include=abstracts&include=actions&include=sources&include=documents&include=votes{key}')
+request_politician = Template(f'{root}{route_people}{query_id}$id&{key}')
 
-request_bill_sponsors = Template(f'')
+request_bill = Template(f'{root}{route_bills}%id?include=sponsorships&include=abstracts&include=actions&include=sources&include=documents&include=votes{key}')

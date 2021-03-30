@@ -14,6 +14,9 @@ class User(db.Model):
     
     __tablename__ = 'users'
 
+    def __repr__(self):
+        return self.data
+
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
     username = db.Column(db.String(30), nullable=False)

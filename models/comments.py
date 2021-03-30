@@ -7,6 +7,9 @@ class Comment(db.Model):
 
     __tablename__ = 'comments'
 
+    def __repr__(self):
+        return self.data
+
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
     text = db.Column(db.Text, nullable=False)

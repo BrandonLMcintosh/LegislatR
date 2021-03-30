@@ -6,6 +6,9 @@ class Party(db.Model):
 
     __tablename__ = 'parties'
 
+    def __repr__(self):
+        return self.data
+
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
     name = db.Column(db.Text, nullable=False)
