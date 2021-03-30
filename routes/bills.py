@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint
 from models.bills import Bill
 
 bills = Blueprint("bills", __name__, static_folder="static",

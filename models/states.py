@@ -4,7 +4,7 @@ import re
 from flask import jsonify
 from keys import openstates
 from openstates_urls import request_states, request_state, request_state_bills
-from datetime import date
+from datetime import datetime,
 from models.bills import Bill
 
 
@@ -23,14 +23,21 @@ class State(db.Model):
 
     name = db.Column(db.Text, nullable=False)
 
-    url = db.Column(db.Text)
+    url = db.Column(db.Text, nullable=False)
 
-    last_updated = db.Column(db.DateTime, nullable=False, default=date.today())
+    next_page_request = db.Column(db.Text, nullable=False, default=0)
+
+    last_updated = db.Column(
+        db.DateTime, nullable=False, default=datetime.now())
+
+    @property
+    def days_since_last_update(self):
+        difference = datetime.now() - self.last_updated
+        return difference.days
 
     @property
     def updated(self):
-        days_since_update = date.today() - self.last_updated
-        if days_since_update >= 1:
+        if self.days_since_last_update >= 1:
             return False
         return True
 
@@ -54,10 +61,11 @@ class State(db.Model):
         return data
 
     @classmethod
-    def get(cls, state_code):
-        state = cls.query.filter_by(code=state_code).first()
+    def get(cls, state_id):
+        state = cls.query.filter_by(code=state_id).first()
         if state.updated:
             return state
+        state.next_page_request = 1
         state.update_bills()
         return state
 
@@ -89,12 +97,21 @@ class State(db.Model):
                 db.session.add(new_state)
         db.session.commit()
 
-    def request(self):
-        response = requests.get(request_state.substitute(id=self.id))
+    def get_new_bills(self):
+        response = requests.get(
+            request_state_bills.substitute(id=self.id, page=self.next_page_request))
         data = response.json()
         result = data['result']
         return result
-    
+
+    def request_bills(self):
+        response = requests.get(request_state_bills.substitute(
+            id=self.id, page=self.next_page_request))
+        data = response.json()
+        result = data['result']
+        self.next_page_request += 1
+        return result
+
     def add_bills(self, result):
         existing_bills = self.bills
         bill_ids = []
@@ -104,7 +121,7 @@ class State(db.Model):
             if bill['id'] not in bill_ids:
                 id = bill['id']
                 created_at = bill['created_at']
-                updated_at = date.today()
+                updated_at = datetime.now()
                 session = bill['session']
                 identifier = bill['identifier']
                 title = bill['title']
@@ -118,18 +135,10 @@ class State(db.Model):
                 )
                 db.session.add(new_bill)
                 self.bills.append(new_bill)
-                
 
-    
-    def update_bills(self, page=1):
-        result = self.request_bills(page)
+    def update_bills(self):
+        result = self.request_bills()
         self.add_bills(result)
+        self.last_updated = datetime.now()
         db.session.add(self)
         db.session.commit()
-        
-
-    def request_bills(self, page):
-        response = requests.get(request_state_bills.substitute(
-            state_name=self.name, page=page))
-        data = response.json()
-        results = data['results']

@@ -3,7 +3,7 @@ from flask import json, jsonify
 from models.parties import Party
 import requests
 from openstates_urls import request_politician
-from datetime import date
+from datetime import datetime
 
 
 class Politician(db.Model):
@@ -16,9 +16,7 @@ class Politician(db.Model):
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
-    first_name = db.Column(db.Text)
-
-    last_name = db.Column(db.Text)
+    name = db.Column(db.Text, nullable=False)
 
     title = db.Column(db.Text, nullable=False)
 
@@ -26,7 +24,8 @@ class Politician(db.Model):
 
     email = db.Column(db.Text, nullable=False)
 
-    updated_at = db.Column(db.DateTime, nullable=False, default=date.today())
+    last_updated = db.Column(
+        db.DateTime, nullable=False, default=datetime.now())
 
     party_id = db.Column(db.Integer, db.ForeignKey(
         'parties.id'))
@@ -39,21 +38,21 @@ class Politician(db.Model):
     state = db.relationship('State', backref='politicians')
 
     @property
+    def days_since_last_update(self):
+        difference = datetime.now() = self.last_updated
+        return difference.days
+
+    @property
     def updated(self):
-        days_since_update = date.today() - self.updated_at
-        if days_since_update >= 30:
+        if self.days_since_last_update >= 30:
             return False
         return True
 
     @property
-    def full_name(self):
-        return self.first_name + self.last_name
-
-    @property
     def data(self):
         data = {
-            'os_id': self.os_id,
-            'full_name': self.full_name,
+            'id': self.id,
+            'name': self.name,
             'title': self.title,
             'party': self.party,
             'state': self.state,
@@ -66,35 +65,33 @@ class Politician(db.Model):
     @classmethod
     def get(cls, id):
         politician = cls.query.filter_by(id=id).first()
-        if politician.full:
+        if politician.updated:
             return politician
         politician.update()
-        return politician
+        cls.get(id)
 
     def request(self):
         response = requests.get(request_politician.substitute(id=self.id))
-        return response
-        # needs finished
-
-    def update(self):
-        response = requests.get(
-            request_politician.substitute(id=self.id))
         data = response.json()
-        results = data['result']
+        result = data['result']
+        return result
+
+    def patch(self, results):
         self.first_name = results['given_name']
         self.last_name = results['family_name']
         self.title = results['current_role']['title']
         self.email = results['email']
         self.image = results['image']
+        party_name = results['person']['party']
+        self.add_party(party_name)
+
+    def update(self):
+        results = self.request()
+        self.patch(results)
+        self.last_updated = datetime.now()
+        db.session.add(self)
+        db.session.commit()
 
     def add_party(self, party_name):
         party = Party.get(party_name)
-        if party:
-            self.party = party
-            return
-        new_party = Party(name=party_name)
-        db.session.add(new_party)
-        db.session.commit()
-        party = Party.get(party_name)
         self.party = party
-        return

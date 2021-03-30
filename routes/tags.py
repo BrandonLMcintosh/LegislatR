@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint
 from models.tags import Tag
 
 tags = Blueprint("tags", __name__, static_folder="static",

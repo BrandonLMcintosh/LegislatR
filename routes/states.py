@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint
 from models.states import State
 
 states = Blueprint("states", __name__, static_folder="static",
@@ -10,7 +10,13 @@ def list():
     return State.get_all()
 
 
-@states.route('/<int:state_code>')
-def state(state_code):
-    state = State.get(state_code)
+@states.route('/<string:state_id>')
+def state(state_id):
+    state = State.get(state_id)
+    return state.data
+
+
+@states.route('/<string:state_id>/bills')
+def state_bills(state_id):
+    state = State.get(state_id)
     return state.data

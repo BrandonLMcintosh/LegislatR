@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint
 from models.users import User
 
 messages = Blueprint("messages", __name__,

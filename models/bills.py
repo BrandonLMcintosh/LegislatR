@@ -4,7 +4,7 @@ from models.tags import Tag
 from models.actions import Action
 import requests
 from openstates_urls import request_bill
-from datetime import date
+from datetime import datetime
 
 
 class Bill(db.Model):
@@ -17,15 +17,17 @@ class Bill(db.Model):
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
-    created_at = db.Column(db.DateTime, nullable=False)
+    db_created_at = db.Column(db.Text, nullable=False)
 
-    updated_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
     session = db.Column(db.Text, nullable=False)
 
     identifier = db.Column(db.Text, nullable=False)
 
     title = db.Column(db.Text, nullable=False)
+
+    full = db.Column(db.Boolean, nullable=False, default=False)
 
     abstract = db.Column(db.Text)
 
@@ -47,13 +49,23 @@ class Bill(db.Model):
     comments = db.relationship('Comment', backref='bill')
 
     @property
+    def created_at(self):
+        new_date = datetime.strptime(self.db_created_at[0:10], '%Y-%m-%d')
+        return new_date
+
+    @property
+    def days_since_last_update(self):
+        difference = datetime.now() - self.updated_at
+        return difference.days
+
+    @ property
     def updated(self):
-        days_since_update = date.today() - self.updated_at
-        if (days_since_update >= 1) or (not self.abstract):
+
+        if (self.days_since_update >= 1) or (not self.full):
             return False
         return True
 
-    @property
+    @ property
     def data(self):
         data = {
             'id': self.id,
@@ -67,7 +79,7 @@ class Bill(db.Model):
         }
         return data
 
-    @classmethod
+    @ classmethod
     def get(cls, os_id):
         bill = cls.query.filter_by(os_id=os_id).first()
         if bill.updated:
@@ -91,7 +103,7 @@ class Bill(db.Model):
                                 description=description, date=date, order=order, bill_id=self.id)
             db.session.add(new_action)
         db.session.commit()
-    
+
     def patch(self, result):
         self.abstract = result['abstracts'][0]['abstract']
         self.url = result['sources'][0]['url']

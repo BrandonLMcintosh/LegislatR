@@ -3,6 +3,12 @@
 -prevent column header click events when column is expanded
 -implement search bar with results for bills / states / tags
 
--politician model update functions in same format as state/bills
+-politician model update functions in same format as state/bills - DONE
+-Add updated_by in query search for request_state_bills - DONE
+-finish bills routes
+-Finish states/bills route
+-Start testing routes in JSON in Insomnia
+     -Confirm all routes are working as intended
 
+-Build front-end more
 
