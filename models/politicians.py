@@ -40,7 +40,10 @@ class Politician(db.Model):
 
     @property
     def updated(self):
-
+        days_since_update = date.today() - self.updated_at
+        if days_since_update >= 30:
+            return False
+        return True
 
     @property
     def full_name(self):
@@ -70,6 +73,8 @@ class Politician(db.Model):
 
     def request(self):
         response = requests.get(request_politician.substitute(id=self.id))
+        return response
+        # needs finished
 
     def update(self):
         response = requests.get(
