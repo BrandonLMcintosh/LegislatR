@@ -1,10 +1,9 @@
 from models_shared import db
-from flask import json, jsonify
-from models.tags import Tag
 from models.actions import Action
 import requests
 from openstates_urls import request_bill
 from datetime import datetime
+import json
 
 
 class Bill(db.Model):
@@ -13,7 +12,7 @@ class Bill(db.Model):
     __tablename__ = 'bills'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 

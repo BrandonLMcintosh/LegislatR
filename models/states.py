@@ -1,11 +1,11 @@
 from models_shared import db
 import requests
 import re
-from flask import jsonify
 from keys import openstates
 from openstates_urls import request_states, request_state, request_state_bills
 from datetime import datetime
 from models.bills import Bill
+import json
 
 
 openstates_key = openstates
@@ -17,7 +17,7 @@ class State(db.Model):
     __tablename__ = 'states'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
@@ -70,19 +70,18 @@ class State(db.Model):
     @property
     def bills_data(self):
         data = {
-            'bills':self.bills
+            'bills': self.bills
         }
-        return jsonify(data)
+        return data
 
     @classmethod
-    def get(cls, id=None):
+    def get(cls, id):
         state = cls.query.get_or_404(id)
         if state.updated:
             return state
         state.next_page_request = 1
         state.update_bills()
         return state
-        
 
     @classmethod
     def get_all(cls):
@@ -91,7 +90,7 @@ class State(db.Model):
         response['data'] = []
         for state in states:
             response['data'].append(state.data)
-        return jsonify(response)
+        return response
 
     @classmethod
     def Generate_States(cls):

@@ -1,9 +1,9 @@
 from models_shared import db
-from flask import json, jsonify
 from models.parties import Party
 import requests
 from openstates_urls import request_politician
 from datetime import datetime
+import json
 
 
 class Politician(db.Model):
@@ -12,7 +12,7 @@ class Politician(db.Model):
     __tablename__ = 'politicians'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
@@ -59,8 +59,7 @@ class Politician(db.Model):
             'sponsored_bills': self.sponsored_bills
         }
 
-        response = jsonify(data)
-        return response
+        return data
 
     @classmethod
     def get(cls, id):

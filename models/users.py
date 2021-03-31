@@ -1,21 +1,22 @@
 from models_shared import db
-from flask import json, jsonify, session
+from flask import session
 from flask_bcrypt import Bcrypt
 from models.states import State
 from models.bills import Bill
 from models.tags import Tag
 from models.comments import Comment
+import json
 
 bcrypt = Bcrypt()
 
 
 class User(db.Model):
     """User"""
-    
+
     __tablename__ = 'users'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
@@ -48,21 +49,20 @@ class User(db.Model):
     def data(self):
         data = {
             'username': self.username,
-            'state': self.state,
+            'state': self.state.data,
             'tags_following': self.tags_following,
             'bills_following': self.bills_following,
             'comments': self.comments,
-            'liked_comments': self.liked_comments}
-        response = jsonify(data)
-        return response
+            'liked_comments': self.liked_comments
+        }
+        return data
 
     @property
     def bills_data(self):
         data = {
             'bills': self.bills_following
         }
-        response = jsonify(data)
-        return response
+        return data
 
     @classmethod
     def get(cls, user_id=None, username=None):
@@ -80,21 +80,21 @@ class User(db.Model):
             if bcrypt.check_password_hash(user.password, password):
                 session['user_id'] = user.id
                 result['data'] = user.data
-                return jsonify(result)
+                return result
             result['data'] = {'error': 'Incorrect username / password'}
-            return jsonify(result)
+            return result
         result['data'] = {'error': 'That username does not exist'}
-        return jsonify(result)
+        return result
 
     @classmethod
-    def register(cls, username, password, phone, state_code, tags):
+    def register(cls, username, password, phone, state_id):
         result = {}
         if cls.get(username=username):
             result['data'] = {'error': 'That username already exists'}
-            return jsonify(result)
+            return result
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf8')
-        existing_state = State.get(code=state_code)
+        existing_state = State.get(state_id)
         state_id = existing_state.id
         user = cls(
             username=username,
@@ -103,10 +103,11 @@ class User(db.Model):
             state_id=state_id)
         db.session.add(user)
         db.session.commit()
-        new_user = cls.get(username)
-        session['user'] = new_user
-        result['data'] = {'registered': f'successfully registered {username}'}
-        return jsonify(result)
+        new_user = cls.get(username=username)
+        session['user_id'] = new_user.id
+        result['data'] = {
+            'registered': f'successfully registered {new_user.username}'}
+        return result
 
     @classmethod
     def is_logged_in(cls):
@@ -120,7 +121,7 @@ class User(db.Model):
         result = {}
         session.clear()
         result['data'] = {'logout': 'success'}
-        return jsonify(result)
+        return result
 
     def toggle_follow_bill(self, bill_id):
         result = {}
@@ -128,10 +129,10 @@ class User(db.Model):
         if bill in self.bills_following:
             self.bills_following.remove(bill)
             result['data'] = {'bill_unfollowed': bill.data}
-            return jsonify(result)
+            return result
         self.bills_following.append(bill)
         result['data'] = {'bill_followed': bill.data}
-        return jsonify(result)
+        return result
 
     def toggle_follow_tag(self, tag_id):
         result = {}
@@ -139,10 +140,10 @@ class User(db.Model):
         if tag in self.tags_following:
             self.tags_following.remove(tag)
             result['data'] = {'tag_unfollowed': tag.data}
-            return jsonify(result)
+            return result
         self.tags_following.append(tag)
         result['data'] = {'tag_followed': tag.data}
-        return jsonify(result)
+        return result
 
     def comment(self, bill_id, text):
         result = {}
@@ -153,14 +154,11 @@ class User(db.Model):
         result['data'] = {'new_comment': {
             'bill': bill.data,
         }}
-        return jsonify(result)
-
+        return result
 
     @classmethod
     def authentication_error(cls):
         data = {
-            'auth_error':'you must be logged in to do this'
+            'auth_error': 'you must be logged in to do this'
         }
-        return jsonify(data)
-
-    
+        return data

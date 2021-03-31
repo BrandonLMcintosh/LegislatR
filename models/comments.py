@@ -1,5 +1,5 @@
 from models_shared import db
-from flask import jsonify
+import json
 
 
 class Comment(db.Model):
@@ -8,7 +8,7 @@ class Comment(db.Model):
     __tablename__ = 'comments'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
@@ -27,8 +27,7 @@ class Comment(db.Model):
             'likes': self.likes,
         }
 
-        response = jsonify(data)
-        return response
+        return data
 
     @classmethod
     def get(cls, comment_id):

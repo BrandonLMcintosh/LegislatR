@@ -23,10 +23,9 @@ def register():
     username = data['username']
     password = data['password']
     phone = data['phone']
-    state = data['state']
-    tags = data['tags']
+    state_id = data['state']
 
-    return User.register(username, password, phone, state, tags)
+    return User.register(username, password, phone, state_id)
 
 
 @users.route('/logout', methods=["GET"])

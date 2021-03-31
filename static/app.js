@@ -64,22 +64,17 @@ document.addEventListener("DOMContentLoaded", function () {
   //   loadPage();
   // });
 
+  const APIURL = "https://localhost:5000/";
+
   class App {
     constructor(pages = {}) {
       this.pages = pages;
     }
 
-    build = function () {};
-
-    populate = async function () {};
-
-    update = async function () {
-      for (let page of pages) {
-        await page.update();
-      }
+    selectPage = function () {
+      // hide all pages
+      // unhide page I want
     };
-
-    selectPage = function () {};
   }
 
   class Page {
@@ -88,18 +83,16 @@ document.addEventListener("DOMContentLoaded", function () {
       this.columns = columns;
     }
 
-    populate = async function () {};
-
-    update = async function () {
-      for (let column of columns) {
-        await column.update();
+    populate = async function () {
+      for (let column of this.columns) {
+        await column.populate();
       }
     };
   }
 
   class Column {
-    constructor(header, url, items = {}) {
-      this.url = url;
+    constructor(header, url, type, items = {}) {
+      this.url = APIURL + url;
       this.header = header;
       this.type = type;
       this.items = items;
@@ -107,28 +100,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     build = function () {};
 
-    populate = async function () {};
-
-    update = async function () {
-      for (let item of (items = {})) {
-        await item.update();
-      }
-    };
-
-    expand = function () {};
-
-    back = function () {};
-  }
-
-  class Item {
-    constructor(url) {
-      this.url = url;
-    }
-
-    parentHTML = function () {};
-
-    grab = async function () {
-      const results = await axios.get(`${APIURL}`);
+    get = async function () {
+      const results = await axios.get(url);
       return results;
     };
 
@@ -137,18 +110,35 @@ document.addEventListener("DOMContentLoaded", function () {
     back = function () {};
   }
 
+  class Item {
+    constructor(id) {
+      this.url = APIURL + url;
+    }
+
+    get = async function () {
+      const results = await axios.get(url);
+      return results;
+    };
+
+    select = function () {};
+
+    back = function () {};
+  }
+
   class Bill extends Item {
-    constructor(APIURL, body, state, tags, sponsors, comments) {
-      super(APIURL);
-      this.body = body;
+    constructor(id, title, web_url, state, tags, sponsors, actions, comments) {
+      super(id);
+      this.title = title;
+      this.web_url = web_url;
       this.state = state;
       this.tags = tags;
       this.sponsors = sponsors;
+      this.actions = actions;
       this.comments = comments;
     }
 
     update = async function () {
-      const result = await super.grab();
+      const result = await super.get();
       this.body = body;
       this.state = state;
       this.tags = tags;

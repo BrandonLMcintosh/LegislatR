@@ -10,7 +10,6 @@ from routes.states import states
 from routes.politicians import politicians
 
 
-
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///LGSLTR'

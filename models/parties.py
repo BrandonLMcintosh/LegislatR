@@ -1,4 +1,5 @@
 from models_shared import db
+import json
 
 
 class Party(db.Model):
@@ -7,7 +8,7 @@ class Party(db.Model):
     __tablename__ = 'parties'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
@@ -20,6 +21,7 @@ class Party(db.Model):
             'name': self.name,
             'politicians': self.politicians
         }
+        return data
 
     @classmethod
     def get(cls, party_name):

@@ -1,5 +1,5 @@
 from models_shared import db
-from flask import jsonify
+import json
 
 
 class Action(db.Model):
@@ -8,7 +8,7 @@ class Action(db.Model):
     __tablename__ = 'actions'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     organization = db.Column(db.Text, nullable=False)
@@ -28,6 +28,7 @@ class Action(db.Model):
             'date': self.date,
             'bill': self.bill
         }
+        return data
 
     @classmethod
     def get(cls, action_id):

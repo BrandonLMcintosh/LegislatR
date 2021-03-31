@@ -1,5 +1,5 @@
 from models_shared import db
-from flask import jsonify
+import json
 
 
 class Tag(db.Model):
@@ -8,7 +8,7 @@ class Tag(db.Model):
     __tablename__ = 'tags'
 
     def __repr__(self):
-        return self.data
+        return json.dumps(self.data)
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
@@ -20,6 +20,7 @@ class Tag(db.Model):
             'name': self.name,
             'bills_tagged': self.bills_tagged
         }
+        return data
 
     @classmethod
     def get(cls, tag_id):
