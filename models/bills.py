@@ -33,7 +33,7 @@ class Bill(db.Model):
 
     url = db.Column(db.Text)
 
-    state_id = db.Column(db.Integer, db.ForeignKey(
+    state_id = db.Column(db.Text, db.ForeignKey(
         'states.id'), nullable=False)
 
     state = db.relationship('State', backref='bills')
@@ -80,8 +80,8 @@ class Bill(db.Model):
         return data
 
     @ classmethod
-    def get(cls, os_id):
-        bill = cls.query.filter_by(os_id=os_id).first()
+    def get(cls, id):
+        bill = cls.query.get_or_404(id)
         if bill.updated:
             return bill
         bill.update()

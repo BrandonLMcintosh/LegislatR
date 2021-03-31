@@ -32,14 +32,14 @@ class Politician(db.Model):
 
     party = db.relationship('Party', backref='politicians')
 
-    state_id = db.Column(db.Integer, db.ForeignKey(
+    state_id = db.Column(db.Text, db.ForeignKey(
         'states.id'), nullable=False)
 
     state = db.relationship('State', backref='politicians')
 
     @property
     def days_since_last_update(self):
-        difference = datetime.now() = self.last_updated
+        difference = datetime.now() - self.last_updated
         return difference.days
 
     @property

@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 def years_ago(years):
     today = date.today()
-    years = timedelta(year=years)
+    years = timedelta(days=(365*years))
     new_date = today - years
     return new_date
 
@@ -29,8 +29,7 @@ query_id = 'id='
 
 request_state = Template(f'{root}{route_jurisdiction}$id&{key}')
 
-request_states = Template(
-    f'{root}{route_jurisdiction}{query_classification}state&{key}')
+request_states = f'{root}{route_jurisdiction}{query_classification}state&{key}'
 
 request_state_bills = Template(
     f'{root}{route_jurisdiction}$state_name&{query_per_page}20&{query_page}$page&{query_created_since}{years_ago(2)}&{query_updated_since}{years_ago(1)}&{key}')

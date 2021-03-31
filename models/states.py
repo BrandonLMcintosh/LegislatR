@@ -4,7 +4,7 @@ import re
 from flask import jsonify
 from keys import openstates
 from openstates_urls import request_states, request_state, request_state_bills
-from datetime import datetime,
+from datetime import datetime
 from models.bills import Bill
 
 
@@ -43,9 +43,16 @@ class State(db.Model):
 
     @property
     def code(self):
-        pattern = re.compile(r'(?<=state:)[a-z][a-z]')
-        match = pattern.search(self.jurisdiction_id)
-        code = match.group(0)
+        state_pattern = re.compile(r'(?<=state:)[a-z][a-z]')
+        district_pattern = re.compile(r'(?<=district:)[a-z][a-z]')
+        state_match = state_pattern.search(self.id)
+        district_match = district_pattern.search(self.id)
+
+        code = None
+        if state_match:
+            code = state_match.group(0)
+        if district_match:
+            code = district_match.group(0)
         return code
 
     @property
@@ -60,14 +67,22 @@ class State(db.Model):
         }
         return data
 
+    @property
+    def bills_data(self):
+        data = {
+            'bills':self.bills
+        }
+        return jsonify(data)
+
     @classmethod
-    def get(cls, state_id):
-        state = cls.query.filter_by(code=state_id).first()
+    def get(cls, id=None):
+        state = cls.query.get_or_404(id)
         if state.updated:
             return state
         state.next_page_request = 1
         state.update_bills()
         return state
+        
 
     @classmethod
     def get_all(cls):

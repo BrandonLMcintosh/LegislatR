@@ -1,29 +1,37 @@
-from flask import Blueprint
+from flask import Blueprint, session, request
 from models.bills import Bill
+from models.users import User
 
 bills = Blueprint("bills", __name__, static_folder="static",
                   template_folder="templates")
 
-
 @bills.route('/list')
 def list():
-    # followed bills
-    return "list"
+    if User.is_logged_in():
+        user = User.get(session['user_id'])
+        return user.bills_data
+    return User.authentication_error()
 
 
-@bills.route('/<int:bill_id>')
-def bill():
-    # details on a specific bill
-    return "bill"
+@bills.route('/<path:bill_id>')
+def bill(bill_id):
+    bill = Bill.get(bill_id)
+    return bill.data
 
 
-@bills.route('/<int:bill_id>/like', methods=["POST"])
+@bills.route('/<path:bill_id>/follow', methods=["POST"])
 def bill_follow(bill_id):
-    # follow a bill
-    return "like"
+    if User.is_logged_in():
+        user = User.get(session['user_id'])
+        return user.toggle_follow_bill(bill_id)
+    return User.authentication_error()
 
 
-@bills.route('/<int:bill_id>/comment', methods=["POST", "DELETE", "PATCH"])
+@bills.route('/<path:bill_id>/comment', methods=["POST", "DELETE", "PATCH"])
 def bill_comment(bill_id):
-    # comment on a bill
-    return "comment"
+    data = request.get_json()
+    text = data['text']
+    if User.is_logged_in():
+        user = User.get(session['user_id'])
+        return user.comment(bill_id, text)
+    return User.authentication_error()

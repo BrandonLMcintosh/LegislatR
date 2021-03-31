@@ -16,7 +16,7 @@ class Comment(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    bill_id = db.Column(db.Integer, db.ForeignKey('bills.id'), nullable=False)
+    bill_id = db.Column(db.Text, db.ForeignKey('bills.id'), nullable=False)
 
     @property
     def data(self):
@@ -31,9 +31,8 @@ class Comment(db.Model):
         return response
 
     @classmethod
-    def get(cls, user_id, text, bill_id):
-        comment = cls.query.filter_by(
-            user_id=user_id, text=text, bill_id=bill_id).first()
+    def get(cls, comment_id):
+        comment = cls.query.get_or_404(comment_id)
         return comment
 
     def delete(self):

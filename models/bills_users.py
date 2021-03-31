@@ -6,7 +6,7 @@ class BillUser(db.Model):
 
     __tablename__ = 'bills_users'
 
-    bill_id = db.Column(db.Integer, db.ForeignKey(
+    bill_id = db.Column(db.Text, db.ForeignKey(
         'bills.id'), primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey(

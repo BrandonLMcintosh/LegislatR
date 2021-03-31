@@ -24,7 +24,7 @@ def register():
     password = data['password']
     phone = data['phone']
     state = data['state']
-    tags = data['tags'] or []
+    tags = data['tags']
 
     return User.register(username, password, phone, state, tags)
 
@@ -36,4 +36,4 @@ def logout():
 
 @users.route('/<int:user_id>', methods=["GET"])
 def get(user_id):
-    User.get(session)
+    User.get(user_id=session['user_id'])

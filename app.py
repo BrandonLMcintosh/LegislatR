@@ -21,6 +21,9 @@ app.config['SECRET_KEY'] = secret_key
 db.app = app
 db.init_app(app)
 
+# db.drop_all()
+# db.create_all()
+
 State.Generate_States()
 
 app.register_blueprint(bills, url_prefix="/bills")

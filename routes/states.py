@@ -10,13 +10,13 @@ def list():
     return State.get_all()
 
 
-@states.route('/<string:state_id>')
+@states.route('/<path:state_id>')
 def state(state_id):
     state = State.get(state_id)
     return state.data
 
 
-@states.route('/<string:state_id>/bills')
+@states.route('/<path:state_id>/bills')
 def state_bills(state_id):
     state = State.get(state_id)
-    return state.data
+    return state.bills_data

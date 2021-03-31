@@ -5,7 +5,7 @@
 
 -politician model update functions in same format as state/bills - DONE
 -Add updated_by in query search for request_state_bills - DONE
--finish bills routes
+-finish bills routes - DONE
 -Finish states/bills route
 -Start testing routes in JSON in Insomnia
      -Confirm all routes are working as intended
