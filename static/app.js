@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const pageIDs = ["#account", "#states", "#bills"];
-  const pages = ['account', 'states', 'bills']
+  const pages = ["account", "states", "bills"];
   const apiURL = "http://localhost:5000/";
   const billsPage = document.querySelector("#bills");
   const statesPage = document.querySelector("#states");
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (userID) {
       pageID = "#bills";
     }
-    location.hash = 
+    location.hash = None;
     const contentArea = document.querySelector(pageID);
     contentArea.style.display = "flex";
   }
