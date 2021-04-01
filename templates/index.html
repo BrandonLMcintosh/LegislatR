@@ -52,6 +52,9 @@
             <li class="nav-item">
               <a class="nav-link" href="#bills" id="nav-bills">Bills</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#account" id="nav-account">Account</a>
+            </li>
           </ul>
           <form class="d-flex">
             <input
@@ -92,13 +95,59 @@
       <div id="states" class="flex-container">
         <div id="states-list" class="flex-column">
           <h3 class="flex-column-header">States</h3>
-          <div class="flex-column-item"></div>
         </div>
         <div id="states-info" class="flex-column">
           <h3 class="flex-column-header">Info</h3>
         </div>
       </div>
-      <div id="account" class="flex-container"></div>
+      <div id="account" class="flex-container">
+        <div id="account-login" class="flex-column">
+          <div class="flex-column-header">
+            <h3>login</h3>
+          </div>
+          <form class="flex-column-item" id="login-form">
+            <label for="login-form-username">Username</label>
+            <input
+              type="text"
+              id="login-form-username"
+              class="login-form-item"
+            />
+            <label for="login-form-password">Password</label>
+            <input
+              type="text"
+              id="login-form-password"
+              class="login-form-item"
+            />
+          </form>
+        </div>
+        <div id="account-register" class="flex-column">
+          <div class="flex-column-header">
+            <h3>register</h3>
+          </div>
+          <form class="flex-column-item" id="register-form">
+            <label for="register-form-username">Username</label>
+            <input
+              type="text"
+              id="register-form-username"
+              class="login-form-item"
+            />
+            <label for="register-form-password">Password</label>
+            <input
+              type="password"
+              id="register-form-password"
+              class="login-form-item"
+            />
+            <label for="register-form-phone">Phone</label>
+            <input
+              type="text"
+              id="register-form-phone"
+              class="login-form-item"
+            />
+            <label for="register-form-state">State</label>
+            <select name="state" id="register-form-state-select"></select>
+          </form>
+        </div>
+      </div>
     </div>
 
     <footer>

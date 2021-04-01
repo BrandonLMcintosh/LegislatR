@@ -11,4 +11,7 @@
      -Confirm all routes are working as intended - DONE
 
 -Build front-end more
+     -style login/register form
+     -create logout button in nav
+     
 

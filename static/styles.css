@@ -178,6 +178,7 @@ div#page-content {
 /* states page */
 #states-list {
   flex-basis: 100%;
+  overflow: scroll;
 }
 
 #states-list .flex-column-item {

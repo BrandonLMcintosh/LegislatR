@@ -45,14 +45,19 @@ class State(db.Model):
     def code(self):
         state_pattern = re.compile(r'(?<=state:)[a-z][a-z]')
         district_pattern = re.compile(r'(?<=district:)[a-z][a-z]')
+        territory_pattern = re.compile(r'(?<=territory:)[a-z][a-z]')
+
         state_match = state_pattern.search(self.id)
         district_match = district_pattern.search(self.id)
+        territory_match = territory_pattern.search(self.id)
 
         code = None
         if state_match:
             code = state_match.group(0)
         if district_match:
             code = district_match.group(0)
+        if territory_match: 
+            code = territory_match.group(0)
         return code
 
     @property
