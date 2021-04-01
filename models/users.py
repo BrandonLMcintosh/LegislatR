@@ -136,7 +136,7 @@ class User(db.Model):
 
     def toggle_follow_tag(self, tag_id):
         result = {}
-        tag = Tag.get(tag_id)
+        tag = Tag.get(tag_id=tag_id)
         if tag in self.tags_following:
             self.tags_following.remove(tag)
             result['data'] = {'tag_unfollowed': tag.data}

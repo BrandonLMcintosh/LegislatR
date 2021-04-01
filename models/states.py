@@ -56,7 +56,7 @@ class State(db.Model):
             code = state_match.group(0)
         if district_match:
             code = district_match.group(0)
-        if territory_match: 
+        if territory_match:
             code = territory_match.group(0)
         return code
 
@@ -115,13 +115,6 @@ class State(db.Model):
                 )
                 db.session.add(new_state)
         db.session.commit()
-
-    def get_new_bills(self):
-        response = requests.get(
-            request_state_bills.substitute(id=self.id, page=self.next_page_request))
-        data = response.json()
-        result = data['result']
-        return result
 
     def request_bills(self):
         response = requests.get(request_state_bills.substitute(
