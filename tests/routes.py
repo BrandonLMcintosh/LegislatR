@@ -7,24 +7,17 @@ app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 
 class TestRoutes(TestCase):
-    def setUp(self):
-        session.clear()
 
-    def test_user_get(self):
+    def test_user_full_registration(self):
         with app.test_client() as client:
-            pass
-
-    def test_user_login(self):
-        with app.test_client() as client:
-            pass
-
-    def test_user_register(self):
-        with app.test_client() as client:
-            pass
-
-    def test_user_logout(self):
-        with app.test_client() as client:
-            pass
+            data = dict(
+                username = 'test001',
+                password = 'test001',
+                state = 'ocd-jurisdiction/country:us/state:al/government',
+                phone = '0000000000')
+            result = client.post('/user/register', json=data)
+            self.assertEqual(result.status_code, 200)
+            self.assertEqual()
 
     def test_bill_get(self):
         with app.test_client() as client:

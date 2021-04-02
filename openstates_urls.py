@@ -32,7 +32,7 @@ request_state = Template(f'{root}{route_jurisdiction}$id&{key}')
 request_states = f'{root}{route_jurisdiction}{query_classification}state&{key}'
 
 request_state_bills = Template(
-    f'{root}{route_jurisdiction}$state_name&{query_per_page}20&{query_page}$page&{query_created_since}{years_ago(2)}&{query_updated_since}{years_ago(1)}&{key}')
+    f'{root}{route_bills}{query_jurisdiction}$state_name&{query_per_page}20&{query_page}$page&{query_created_since}{years_ago(2)}&{query_updated_since}{years_ago(1)}&{key}')
 
 request_state_politicians = Template(
     f'{root}{route_people}{query_jurisdiction}$id&{key}')

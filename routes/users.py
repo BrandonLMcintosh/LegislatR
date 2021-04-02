@@ -24,8 +24,11 @@ def register():
     password = data['password']
     phone = data['phone']
     state_id = data['state']
+    response = User.register(username, password, phone, state_id)
 
-    return User.register(username, password, phone, state_id)
+    print(response)
+    print('00000000000')
+    return response
 
 
 @users.route('/logout', methods=["GET"])

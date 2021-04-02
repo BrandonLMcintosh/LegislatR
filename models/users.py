@@ -95,18 +95,25 @@ class User(db.Model):
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf8')
         existing_state = State.get(state_id)
+        print('found existing state')
         state_id = existing_state.id
+        print('found state id')
         user = cls(
             username=username,
             password=hashed_password,
             phone=phone,
             state_id=state_id)
         db.session.add(user)
+        print('added user to db session')
         db.session.commit()
+        print('committing user')
         new_user = cls.get(username=username)
+        print('found new user')
         session['user_id'] = new_user.id
+        print('adding user id to session')
         result['data'] = {
             'registered': f'successfully registered {new_user.username}'}
+        print('created return response')
         return result
 
     @classmethod

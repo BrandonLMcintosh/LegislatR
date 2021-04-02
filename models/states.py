@@ -86,7 +86,7 @@ class State(db.Model):
             return state
         state.next_page_request = 1
         state.update_bills()
-        return state
+        cls.get(id)
 
     @classmethod
     def get_all(cls):
@@ -118,9 +118,9 @@ class State(db.Model):
 
     def request_bills(self):
         response = requests.get(request_state_bills.substitute(
-            id=self.id, page=self.next_page_request))
+            state_name=self.name, page=self.next_page_request))
         data = response.json()
-        result = data['result']
+        result = data['results']
         self.next_page_request += 1
         return result
 
@@ -137,6 +137,12 @@ class State(db.Model):
                 session = bill['session']
                 identifier = bill['identifier']
                 title = bill['title']
+                print(type(id))
+                print(type(created_at))
+                print(type(updated_at))
+                print(type(session))
+                print(type(identifier))
+                print(type(title))
                 new_bill = Bill(
                     id=id,
                     created_at=created_at,
