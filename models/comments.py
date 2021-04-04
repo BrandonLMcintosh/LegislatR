@@ -1,5 +1,6 @@
 from models_shared import db
 import json
+from models.comments_likes import CommentLike
 
 
 class Comment(db.Model):
@@ -22,11 +23,10 @@ class Comment(db.Model):
     def data(self):
         data = {
             'text': self.text,
-            'user': self.user,
-            'bill': self.bill,
-            'likes': self.likes,
+            'user': self.user.username,
+            'bill': self.bill.id,
+            'likes': CommentLike.query.filter_by(comment_id=self.id).count(),
         }
-
         return data
 
     @classmethod

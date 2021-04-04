@@ -11,5 +11,3 @@ class BillPolitician(db.Model):
 
     politician_id = db.Column(
         db.Text, db.ForeignKey('politicians.id'), primary_key=True)
-
-    primary = db.Column(db.Boolean, nullable=False)

@@ -1,5 +1,4 @@
 from flask import Blueprint, request, session
-from flask.wrappers import Response
 from models.tags import Tag
 from models.users import User
 
@@ -14,15 +13,16 @@ def list():
 
 @tags.route("/<int:tag_id>")
 def tag(tag_id):
-    return Tag.get(tag_id)
+    tag = Tag.get(tag_id=tag_id)
+    return tag.data
 
 
 @tags.route('/create', methods=['POST'])
 def tag_add():
     if User.is_logged_in():
         data = request.get_json()
-        name = data['name']
-        return Tag.add(name)
+        name = data['tag_name']
+        return Tag.add(name=name)
     return User.authentication_error()
 
 

@@ -1,5 +1,7 @@
 from models_shared import db
 from models.actions import Action
+from models.politicians import Politician
+from models.tags import Tag
 import requests
 from openstates_urls import request_bill
 from datetime import datetime
@@ -11,8 +13,8 @@ class Bill(db.Model):
 
     __tablename__ = 'bills'
 
-    def __repr__(self):
-        return json.dumps(self.data)
+    # def __repr__(self):
+    #     return json.dumps(self.data)
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
@@ -60,7 +62,7 @@ class Bill(db.Model):
     @ property
     def updated(self):
 
-        if (self.days_since_update >= 1) or (not self.full):
+        if (self.days_since_last_update >= 1) or (not self.full):
             return False
         return True
 
@@ -69,14 +71,42 @@ class Bill(db.Model):
         data = {
             'id': self.id,
             'title': self.title,
+            'abstract':self.abstract,
             'url': self.url,
-            'state': self.state,
-            'tags': self.tags,
-            'sponsors': self.sponsors,
-            'actions': self.actions,
-            'comments': self.comments
+            'state': self.state.id,
+            'tags': self.tags_data,
+            'sponsors': self.sponsors_data,
+            'actions': self.actions_data,
+            'comments': self.comments_data, 
+            'full': self.full
         }
         return data
+
+    @property
+    def tags_data(self):
+        data = []
+        for tag in self.tags:
+            data.append(tag.name)
+        return data
+
+    @property
+    def sponsors_data(self):
+        data = []
+        for sponsor in self.sponsors:
+            data.append({'name':sponsor.name, 'id':sponsor.id})
+        return data
+
+    @property
+    def comments_data(self):
+        data = []
+        for comment in self.comments:
+            data.append(comment.data)
+
+    @property
+    def actions_data(self):
+        data = []
+        for action in self.actions:
+            data.append(action.data)
 
     @ classmethod
     def get(cls, id):
@@ -89,8 +119,7 @@ class Bill(db.Model):
     def request(self):
         response = requests.get(request_bill.substitute(id=self.id))
         data = response.json()
-        result = data['result']
-        return result
+        return data
 
     def add_actions(self, actions):
         for action in actions:
@@ -103,28 +132,54 @@ class Bill(db.Model):
             db.session.add(new_action)
         db.session.commit()
 
+    def add_sponsors(self, sponsorships):
+        for sponsor in sponsorships:
+            person = sponsor['person']
+            id = person['id']
+            name = person['name']
+            party = person['party']
+            title = person['current_role']['title']
+            sponsor = Politician(
+                id=id,
+                name=name,
+                title=title,
+                state_id=self.state_id
+            )
+            sponsor.add_party(party)
+            self.sponsors.append(sponsor)
+
+
+
+
     def patch(self, result):
-        self.abstract = result['abstracts'][0]['abstract']
+        self.abstract = result['abstracts'][0]['abstract'] if len(result['abstracts']) > 0 else ''
         self.url = result['sources'][0]['url']
         actions = result['actions']
+        sponsors = result['sponsorships']
         self.add_actions(actions)
-        self.full = True
+        self.add_sponsors(sponsors)
 
     def update(self):
         result = self.request()
         self.patch(result)
+        self.full = True
         db.session.add(self)
         db.session.commit()
 
-    def toggle_tag(self, tag):
+    def toggle_tag(self, tag_name):
         result = {}
-        if tag in self.tags:
-            self.remove(tag)
-            result['data'] = {'action': 'remove tag', 'bill': self.data}
+        tags = []
+        tag = Tag.get(name=tag_name)
+        for tag in self.tags:
+            tags.append(tag.name)
+        if tag_name in tags:
+            self.tags.remove(tag)
+            db.session.add(self)
+            db.session.commit()
+            result['data'] = {'action': 'remove tag', 'bill': self.id}
+            return result
+        self.tags.append(tag)
         db.session.add(self)
         db.session.commit()
-
-    def add_action(self, action):
-        self.actions.append(action)
-        db.session.add(self)
-        db.session.commit()
+        result['data'] = {'action': 'add tag', 'bill':self.id}
+        return result

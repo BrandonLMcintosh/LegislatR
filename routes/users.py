@@ -1,4 +1,4 @@
-from flask import Blueprint, session, request
+from flask import Blueprint, session, request, jsonify
 from models.users import User
 
 users = Blueprint("users", __name__, static_folder="static",
@@ -14,6 +14,7 @@ def login():
     password = data['password']
 
     return User.login(username, password)
+    
 
 
 @users.route('/register', methods=["POST"])
@@ -25,9 +26,9 @@ def register():
     phone = data['phone']
     state_id = data['state']
     response = User.register(username, password, phone, state_id)
-
-    print(response)
-    print('00000000000')
+    user = User.get(username=username)
+    session['user_id'] = user.id
+    
     return response
 
 

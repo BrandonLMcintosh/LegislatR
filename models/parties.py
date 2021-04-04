@@ -24,11 +24,13 @@ class Party(db.Model):
         return data
 
     @classmethod
-    def get(cls, party_name):
-        party = cls.query.filter_by(name=party_name).first()
+    def get(cls, name):
+        party = cls.query.filter_by(name=name).first()
         if party:
             return party
-        new_party = cls(party_name)
+        new_party = cls(name=name)
         db.session.add(new_party)
         db.session.commit()
-        cls.get(party_name)
+        cls.get(name)
+
+

@@ -11,8 +11,8 @@ class Politician(db.Model):
 
     __tablename__ = 'politicians'
 
-    def __repr__(self):
-        return json.dumps(self.data)
+    # def __repr__(self):
+    #     return json.dumps(self.data)
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
@@ -20,9 +20,11 @@ class Politician(db.Model):
 
     title = db.Column(db.Text, nullable=False)
 
-    image = db.Column(db.Text, nullable=False)
+    image = db.Column(db.Text)
 
-    email = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text)
+
+    full = db.Column(db.Boolean, nullable=False, default=False)
 
     last_updated = db.Column(
         db.DateTime, nullable=False, default=datetime.now())
@@ -54,17 +56,27 @@ class Politician(db.Model):
             'id': self.id,
             'name': self.name,
             'title': self.title,
+            'image':self.image,
+            'email':self.email,
             'party': self.party,
-            'state': self.state,
-            'sponsored_bills': self.sponsored_bills
+            'state': self.state.name,
+            'sponsored_bills': self.sponsored_bills_data,
+            'full': self.full
         }
 
+        return data
+
+    @property
+    def sponsored_bills_data(self):
+        data = []
+        for bill in self.sponsored_bills:
+            data.append(bill.id)
         return data
 
     @classmethod
     def get(cls, id):
         politician = cls.query.filter_by(id=id).first()
-        if politician.updated:
+        if politician.updated and politician.full:
             return politician
         politician.update()
         cls.get(id)
@@ -88,6 +100,7 @@ class Politician(db.Model):
         results = self.request()
         self.patch(results)
         self.last_updated = datetime.now()
+        self.full = True
         db.session.add(self)
         db.session.commit()
 

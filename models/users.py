@@ -15,8 +15,8 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-    def __repr__(self):
-        return json.dumps(self.data)
+    # def __repr__(self):
+    #     return json.dumps(self.data)
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
@@ -24,7 +24,7 @@ class User(db.Model):
 
     password = db.Column(db.Text, nullable=False)
 
-    phone = db.Column(db.Integer, nullable=False)
+    phone = db.Column(db.Text, nullable=False)
 
     state_id = db.Column(db.Text, db.ForeignKey(
         'states.id'), nullable=False)
@@ -40,7 +40,7 @@ class User(db.Model):
     # messages = db.relationship(
     #     'Message', secondary='users_messages', cascade="all, delete-orphan")
 
-    comments = db.relationship('Comment', backref='user')
+    comments = db.relationship('Comment', backref='user', cascade='all, delete-orphan')
 
     liked_comments = db.relationship(
         'Comment', secondary='comments_likes', backref='likes')
@@ -50,18 +50,39 @@ class User(db.Model):
         data = {
             'username': self.username,
             'state': self.state.data,
-            'tags_following': self.tags_following,
-            'bills_following': self.bills_following,
-            'comments': self.comments,
-            'liked_comments': self.liked_comments
+            'tags_following': self.tags_following_data,
+            'bills_following': self.bills_following_data,
+            'comments': self.comments_data,
+            'liked_comments': self.liked_comments_data
         }
         return data
 
     @property
-    def bills_data(self):
-        data = {
-            'bills': self.bills_following
-        }
+    def bills_following_data(self):
+        data = []
+        for bill in self.bills_following:
+            data.append(bill.id)
+        return data
+
+    @property
+    def comments_data(self):
+        data = []
+        for comment in self.comments:
+            data.append(comment.data)
+        return data
+
+    @property
+    def tags_following_data(self):
+        data = []
+        for tag in self.tags_following:
+            data.append(tag.data)
+        return data
+
+    @property
+    def liked_comments_data(self):
+        data = []
+        for comment in self.liked_comments:
+            data.append(comment.data)
         return data
 
     @classmethod
@@ -95,25 +116,17 @@ class User(db.Model):
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf8')
         existing_state = State.get(state_id)
-        print('found existing state')
         state_id = existing_state.id
-        print('found state id')
         user = cls(
             username=username,
             password=hashed_password,
             phone=phone,
             state_id=state_id)
         db.session.add(user)
-        print('added user to db session')
         db.session.commit()
-        print('committing user')
         new_user = cls.get(username=username)
-        print('found new user')
-        session['user_id'] = new_user.id
-        print('adding user id to session')
         result['data'] = {
             'registered': f'successfully registered {new_user.username}'}
-        print('created return response')
         return result
 
     @classmethod
@@ -133,11 +146,18 @@ class User(db.Model):
     def toggle_follow_bill(self, bill_id):
         result = {}
         bill = Bill.get(bill_id)
-        if bill in self.bills_following:
+        following_ids = []
+        for bill in self.bills_following:
+            following_ids.append(bill.id)
+        if bill_id in following_ids:
             self.bills_following.remove(bill)
+            db.session.add(self)
+            db.session.commit()
             result['data'] = {'bill_unfollowed': bill.data}
             return result
         self.bills_following.append(bill)
+        db.session.add(self)
+        db.session.commit()
         result['data'] = {'bill_followed': bill.data}
         return result
 

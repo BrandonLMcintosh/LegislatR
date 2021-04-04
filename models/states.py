@@ -16,14 +16,16 @@ class State(db.Model):
 
     __tablename__ = 'states'
 
-    def __repr__(self):
-        return json.dumps(self.data)
+    # def __repr__(self):
+    #     return json.dumps(self.data)
 
     id = db.Column(db.Text, primary_key=True, nullable=False)
 
     name = db.Column(db.Text, nullable=False)
 
     url = db.Column(db.Text, nullable=False)
+
+    full = db.Column(db.Boolean, nullable=False, default=False)
 
     next_page_request = db.Column(db.Text, nullable=False, default=0)
 
@@ -67,26 +69,44 @@ class State(db.Model):
             'code': self.code,
             'name': self.name,
             'url': self.url,
-            'politicians': self.politicians,
-            'bills': self.bills
+            'politicians': self.politician_data,
+            'bills': self.bills_short_data, 
+            'full': self.full
         }
+
         return data
 
     @property
-    def bills_data(self):
-        data = {
-            'bills': self.bills
-        }
+    def bills_short_data(self):
+        data = []
+
+        for bill in self.bills:
+            data.append(bill.id)
         return data
+
+    @property
+    def bills_long_data(self):
+        data = []
+        for bill in self.bills:
+            data.append(bill.data)
+        return data
+
+    @property
+    def politician_data(self):
+        data = []
+        for politician in self.politicians:
+            data.append(politician.id)
+        return data
+
 
     @classmethod
     def get(cls, id):
         state = cls.query.get_or_404(id)
-        if state.updated:
+        if state.updated and state.full:
             return state
         state.next_page_request = 1
         state.update_bills()
-        cls.get(id)
+        return cls.get(id)
 
     @classmethod
     def get_all(cls):
@@ -132,20 +152,14 @@ class State(db.Model):
         for bill in result:
             if bill['id'] not in bill_ids:
                 id = bill['id']
-                created_at = bill['created_at']
+                db_created_at = bill['created_at']
                 updated_at = datetime.now()
                 session = bill['session']
                 identifier = bill['identifier']
                 title = bill['title']
-                print(type(id))
-                print(type(created_at))
-                print(type(updated_at))
-                print(type(session))
-                print(type(identifier))
-                print(type(title))
                 new_bill = Bill(
                     id=id,
-                    created_at=created_at,
+                    db_created_at=db_created_at,
                     updated_at=updated_at,
                     session=session,
                     identifier=identifier,
@@ -158,5 +172,6 @@ class State(db.Model):
         result = self.request_bills()
         self.add_bills(result)
         self.last_updated = datetime.now()
+        self.full = True
         db.session.add(self)
         db.session.commit()

@@ -18,6 +18,7 @@ route_jurisdiction = 'jurisdictions?'
 route_people = 'people?'
 route_bills = 'bills?'
 
+
 query_classification = 'classification='
 query_jurisdiction = 'jurisdiction='
 query_created_since = 'created_since='
@@ -40,4 +41,4 @@ request_state_politicians = Template(
 request_politician = Template(f'{root}{route_people}{query_id}$id&{key}')
 
 request_bill = Template(
-    f'{root}{route_bills}%id?include=sponsorships&include=abstracts&include=actions&include=sources&include=documents&include=votes{key}')
+    f'{root}bills/$id?include=sponsorships&include=abstracts&include=actions&include=sources&include=documents&include=votes&{key}')

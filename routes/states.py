@@ -19,4 +19,7 @@ def state(state_id):
 @states.route('/<path:state_id>/bills')
 def state_bills(state_id):
     state = State.get(state_id)
-    return state.bills_data
+    data = dict(
+        bills = state.bills_long_data
+    )
+    return data

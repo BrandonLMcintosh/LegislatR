@@ -8,21 +8,27 @@ bills = Blueprint("bills", __name__, static_folder="static",
 @bills.route('/list')
 def list():
     if User.is_logged_in():
-        user = User.get(session['user_id'])
-        return user.bills_data
+        user = User.get(user_id=session['user_id'])
+        response = {
+            'data':user.data['bills_following']
+        }
+        return response
     return User.authentication_error()
 
 
 @bills.route('/<path:bill_id>')
 def bill(bill_id):
     bill = Bill.get(bill_id)
-    return bill.data
+    response = {
+        'data':bill.data
+    }
+    return response
 
 
 @bills.route('/<path:bill_id>/follow', methods=["POST"])
 def bill_follow(bill_id):
     if User.is_logged_in():
-        user = User.get(session['user_id'])
+        user = User.get(user_id=session['user_id'])
         return user.toggle_follow_bill(bill_id)
     return User.authentication_error()
 
@@ -32,6 +38,15 @@ def bill_comment(bill_id):
     data = request.get_json()
     text = data['text']
     if User.is_logged_in():
-        user = User.get(session['user_id'])
+        user = User.get(user_id=session['user_id'])
         return user.comment(bill_id, text)
     return User.authentication_error()
+
+@bills.route('/<path:bill_id>/tag', methods=["POST"])
+def bill_tag(bill_id):
+    data = request.get_json()
+    tag_name = data['tag_name']
+    if User.is_logged_in():
+        bill = Bill.get(bill_id)
+        return bill.toggle_tag(tag_name=tag_name)
+        

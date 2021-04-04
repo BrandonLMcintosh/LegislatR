@@ -18,15 +18,27 @@ class Tag(db.Model):
     def data(self):
         data = {
             'name': self.name,
-            'bills_tagged': self.bills_tagged
+            'tagged_bills': self.bills_tagged_data
         }
+        return data
+
+    @property
+    def bills_tagged_data(self):
+        data = []
+        for bill in self.tagged_bills:
+            data.append(bill.id)
         return data
 
     @classmethod
     def get(cls, tag_id=None, name=None):
-        tag = None
         if name:
             tag = cls.query.filter_by(name=name).first()
+            if tag:
+                return tag
+            tag = cls(name=name)
+            db.session.add(tag)
+            db.session.commit()
+            return cls.get(name=name) 
         tag = cls.query.get(tag_id)
         return tag
 
@@ -42,7 +54,7 @@ class Tag(db.Model):
     @classmethod
     def add(cls, name):
         response = {}
-        tag = cls(name)
+        tag = cls(name=name)
         db.session.add(tag)
         db.session.commit()
         tag = cls.get(name=name)
