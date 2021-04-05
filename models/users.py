@@ -48,6 +48,7 @@ class User(db.Model):
     @property
     def data(self):
         data = {
+            'user_id': self.id,
             'username': self.username,
             'state': self.state.data,
             'tags_following': self.tags_following_data,
@@ -100,7 +101,9 @@ class User(db.Model):
         if user:
             if bcrypt.check_password_hash(user.password, password):
                 session['user_id'] = user.id
-                result['data'] = user.data
+                result['data'] = {
+                    'success': f'User login for {user.username}',
+                    'user_id': user.id}
                 return result
             result['data'] = {'error': 'Incorrect username / password'}
             return result
@@ -126,7 +129,8 @@ class User(db.Model):
         db.session.commit()
         new_user = cls.get(username=username)
         result['data'] = {
-            'registered': f'successfully registered {new_user.username}'}
+            'registered': f'successfully registered {new_user.username}',
+            'user_id': new_user.id}
         return result
 
     @classmethod

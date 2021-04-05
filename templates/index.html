@@ -55,6 +55,11 @@
             <li class="nav-item">
               <a class="nav-link" href="#account" id="nav-account">Account</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link hidden" href="#logout" id="nav-logout">
+                Logout
+              </a>
+            </li>
           </ul>
           <form class="d-flex">
             <input
@@ -114,11 +119,13 @@
             />
             <label for="login-form-password">Password</label>
             <input
-              type="text"
+              type="password"
               id="login-form-password"
               class="login-form-item"
             />
+            <button>Login</button>
           </form>
+          <p id="login-form-error" class="error"></p>
         </div>
         <div id="account-register" class="flex-column">
           <div class="flex-column-header">
@@ -145,7 +152,9 @@
             />
             <label for="register-form-state">State</label>
             <select name="state" id="register-form-state-select"></select>
+            <button>Register</button>
           </form>
+          <p id="register-form-error" class="error"></p>
         </div>
       </div>
     </div>
