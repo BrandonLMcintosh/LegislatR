@@ -14,11 +14,10 @@ def login():
     password = data['password']
 
     response = dict(
-        login = User.login(username, password),
+        login=User.login(username, password),
     )
 
     return User.login(username, password)
-    
 
 
 @users.route('/register', methods=["POST"])
@@ -29,7 +28,7 @@ def register():
     password = data['password']
     phone = data['phone']
     state_id = data['state']
-    
+
     return User.register(username, password, phone, state_id)
 
 
@@ -40,4 +39,5 @@ def logout():
 
 @users.route('/<int:user_id>', methods=["GET"])
 def get(user_id):
-    User.get(user_id=session['user_id'])
+    user = User.get(user_id=session['user_id'])
+    return user.data

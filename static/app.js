@@ -8,10 +8,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   const registerForm = document.querySelector("#register-form");
   const logoutNav = document.querySelector("#nav-logout");
   const accountNav = document.querySelector("#nav-account");
-  const userID = sessionStorage.getItem("userID");
+
+  function getUserID() {
+    const userID = sessionStorage.getItem("userID");
+    return userID;
+  }
 
   function logged_in() {
-    if (sessionStorage.getItem("userID")) {
+    const userID = getUserID();
+    if (userID) {
       logoutNav.classList.remove("hidden");
       accountNav.classList.add("hidden");
       return true;
@@ -29,8 +34,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   async function loadPage(pageID = "#account") {
     hidePages();
     await populateInitialInfo();
-    if (userID) {
-      pageID = "#bills";
+    if (!logged_in() && pageID == "#bills") {
+      pageID = "#account";
+    }
+
+    if (logged_in()) {
+      await populateUserData();
+    }
+    if (pageID == "#logout") {
+      return await logout();
     }
     const contentArea = document.querySelector(pageID);
     contentArea.style.display = "flex";
@@ -55,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   async function populateInitialInfo() {
     const stateSelect = document.querySelector("#register-form-state-select");
     const statesPageColumn = document.querySelector("#states-list");
-    const response = await axios.get(apiURL + "/states/list");
+    const response = await axios.get(apiURL + "states/list");
     const states = response.data;
     for (let state of states.data) {
       const stateOption = document.createElement("option");
@@ -72,6 +84,35 @@ document.addEventListener("DOMContentLoaded", async function () {
       statesPageColumn.appendChild(stateDiv);
     }
   }
+
+  async function populateUserData(userID) {
+    const response = await axios.get(apiURL + `user/${getUserID()}`);
+    const user = response.data;
+    const state_name = user.state.name;
+    const state_id = user.state.id;
+
+    // populateBillsFollowing();
+    await populateStateBills(state_id);
+    // populateUserTags(userID);
+  }
+
+  async function populateStateBills(stateID) {
+    response = await axios.get(apiURL + `states/${stateID}/bills`);
+    bills = response.data.bills;
+    for (let bill of bills) {
+      const billElement = document.createElement("DIV");
+      billElement.classList.add("flex-column-item");
+      billElement.innerHTML;
+    }
+  }
+
+  async function populateUserTags(userID) {}
+
+  async function populateBillsFollowing(userID) {}
+
+  async function populateBill(billID) {}
+
+  async function clearUserData(data) {}
 
   window.addEventListener("hashchange", async function () {
     hash = location.hash;
@@ -124,7 +165,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     username = loginUsername.value;
     password = loginPassword.value;
 
-    response = await axios.post(apiURL + "/user/login", {
+    response = await axios.post(apiURL + "user/login", {
       username: username,
       password: password,
     });
@@ -136,7 +177,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     loginError.innerHTML = null;
 
-    console.log(data);
+    sessionStorage.setItem("userID", data.user_id);
+
+    loginUsername.value = null;
+    loginPassword.value = null;
+
+    location.hash = "";
+    location.hash = "#bills";
   });
 
   registerForm.addEventListener("submit", async function (evt) {
@@ -153,7 +200,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     phone = registerPhone.value;
     state = registerState.value;
 
-    response = await axios.post(apiURL + "/user/register", {
+    response = await axios.post(apiURL + "user/register", {
       username: username,
       password: password,
       phone: phone,
@@ -175,14 +222,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     registerState.value = null;
 
     location.hash = "";
-    location.hash = "bills";
+    location.hash = "#bills";
   });
 
   if (logged_in()) {
-    location.hash = "";
-    location.hash = "bills";
+    await loadPage("#bills");
   } else {
-    location.hash = "";
-    location.hash = "account";
+    await loadPage();
   }
 });
