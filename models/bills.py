@@ -71,6 +71,7 @@ class Bill(db.Model):
         data = {
             'id': self.id,
             'title': self.title,
+            'identifier':self.identifier,
             'abstract':self.abstract,
             'url': self.url,
             'state': self.state.id,
@@ -176,10 +177,12 @@ class Bill(db.Model):
             self.tags.remove(tag)
             db.session.add(self)
             db.session.commit()
-            result['data'] = {'action': 'remove tag', 'bill': self.id}
+            result['action'] = f'remove tag {tag_name}'
+            result['bill'] = self.id
             return result
         self.tags.append(tag)
         db.session.add(self)
         db.session.commit()
-        result['data'] = {'action': 'add tag', 'bill':self.id}
+        result['action'] = f'add tag {tag_name}'
+        result['bill'] = self.id
         return result

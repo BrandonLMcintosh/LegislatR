@@ -112,9 +112,9 @@ class State(db.Model):
     def get_all(cls):
         states = cls.query.all()
         response = {}
-        response['data'] = []
+        response['states'] = []
         for state in states:
-            response['data'].append(state.data)
+            response['states'].append(state.data)
         return response
 
     @classmethod

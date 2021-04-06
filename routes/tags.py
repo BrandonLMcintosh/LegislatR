@@ -14,7 +14,10 @@ def list():
 @tags.route("/<int:tag_id>")
 def tag(tag_id):
     tag = Tag.get(tag_id=tag_id)
-    return tag.data
+    response = {
+        'tag': tag.data
+    }
+    return response
 
 
 @tags.route('/create', methods=['POST'])

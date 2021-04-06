@@ -48,7 +48,7 @@ class User(db.Model):
     @property
     def data(self):
         data = {
-            'user_id': self.id,
+            'id': self.id,
             'username': self.username,
             'state': self.state.data,
             'tags_following': self.tags_following_data,
@@ -63,6 +63,13 @@ class User(db.Model):
         data = []
         for bill in self.bills_following:
             data.append(bill.id)
+        return data
+
+    @property
+    def bills_following_long_data(self):
+        data = []
+        for bill in self.bills_following:
+            data.append(bill.data)
         return data
 
     @property
@@ -101,20 +108,19 @@ class User(db.Model):
         if user:
             if bcrypt.check_password_hash(user.password, password):
                 session['user_id'] = user.id
-                result['data'] = {
-                    'success': f'User login for {user.username}',
-                    'user_id': user.id}
+                result['success'] = f'User login for {user.username}'
+                result['user'] = user.data
                 return result
-            result['data'] = {'error': 'Incorrect username / password'}
+            result['error'] = 'Incorrect username / password'
             return result
-        result['data'] = {'error': 'That username does not exist'}
+        result['error'] = 'That username does not exist'
         return result
 
     @classmethod
     def register(cls, username, password, phone, state_id):
         result = {}
         if cls.get(username=username):
-            result['data'] = {'error': 'That username already exists'}
+            result['error'] = 'That username already exists'
             return result
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf8')
@@ -128,9 +134,8 @@ class User(db.Model):
         db.session.add(user)
         db.session.commit()
         new_user = cls.get(username=username)
-        result['data'] = {
-            'registered': f'successfully registered {new_user.username}',
-            'user_id': new_user.id}
+        result['registered'] = f'successfully registered {new_user.username}'
+        result['user'] = new_user.data
         return result
 
     @classmethod
@@ -144,7 +149,7 @@ class User(db.Model):
     def logout(self):
         result = {}
         session.clear()
-        result['data'] = {'logout': 'success'}
+        result['logout'] = 'success'
         return result
 
     def toggle_follow_bill(self, bill_id):
@@ -157,12 +162,14 @@ class User(db.Model):
             self.bills_following.remove(bill)
             db.session.add(self)
             db.session.commit()
-            result['data'] = {'bill_unfollowed': bill.data}
+            result['action'] = 'unfollowed'
+            result['bill'] = bill.data
             return result
         self.bills_following.append(bill)
         db.session.add(self)
         db.session.commit()
-        result['data'] = {'bill_followed': bill.data}
+        result['action'] = 'followed'
+        result['bill'] = bill.data
         return result
 
     def toggle_follow_tag(self, tag_id):
@@ -170,10 +177,12 @@ class User(db.Model):
         tag = Tag.get(tag_id=tag_id)
         if tag in self.tags_following:
             self.tags_following.remove(tag)
-            result['data'] = {'tag_unfollowed': tag.data}
+            result['action'] = 'unfollowed'
+            result['tag'] = tag.name
             return result
         self.tags_following.append(tag)
-        result['data'] = {'tag_followed': tag.data}
+        result['action'] = 'followed'
+        result['tag'] = tag.name
         return result
 
     def comment(self, bill_id, text):
@@ -182,14 +191,14 @@ class User(db.Model):
         db.session.add(comment)
         db.session.commit()
         bill = Bill.get(bill_id)
-        result['data'] = {'new_comment': {
-            'bill': bill.data,
-        }}
+        result['comment'] = comment.data 
+        result['bill'] = bill.data
         return result
 
     @classmethod
     def authentication_error(cls):
-        data = {
-            'auth_error': 'you must be logged in to do this'
+        result= {
+            'error': 'you must be logged in to do this'
         }
-        return data
+        return result
+    

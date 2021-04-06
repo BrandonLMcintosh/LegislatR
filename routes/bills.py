@@ -10,7 +10,7 @@ def list():
     if User.is_logged_in():
         user = User.get(user_id=session['user_id'])
         response = {
-            'data':user.data['bills_following']
+            'bills':user.bills_following_long_data
         }
         return response
     return User.authentication_error()
@@ -20,7 +20,7 @@ def list():
 def bill(bill_id):
     bill = Bill.get(bill_id)
     response = {
-        'data':bill.data
+        'bill':bill.data
     }
     return response
 
@@ -33,7 +33,7 @@ def bill_follow(bill_id):
     return User.authentication_error()
 
 
-@bills.route('/<path:bill_id>/comment', methods=["POST", "DELETE", "PATCH"])
+@bills.route('/<path:bill_id>/comment', methods=["POST"])
 def bill_comment(bill_id):
     data = request.get_json()
     text = data['text']

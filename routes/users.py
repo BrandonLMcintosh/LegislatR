@@ -13,10 +13,6 @@ def login():
     username = data['username']
     password = data['password']
 
-    response = dict(
-        login=User.login(username, password),
-    )
-
     return User.login(username, password)
 
 
@@ -40,4 +36,7 @@ def logout():
 @users.route('/<int:user_id>', methods=["GET"])
 def get(user_id):
     user = User.get(user_id=session['user_id'])
-    return user.data
+    response = {
+        'user': user.data
+    }
+    return response

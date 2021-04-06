@@ -58,7 +58,5 @@ class Tag(db.Model):
         db.session.add(tag)
         db.session.commit()
         tag = cls.get(name=name)
-        response['data'] = {
-            'created_tag': tag.name
-        }
+        response['created'] = name
         return response

@@ -13,13 +13,16 @@ def list():
 @states.route('/<path:state_id>')
 def state(state_id):
     state = State.get(state_id)
-    return state.data
+    response = {
+        'state': state.data
+    }
+    return response
 
 
 @states.route('/<path:state_id>/bills')
 def state_bills(state_id):
     state = State.get(state_id)
-    data = dict(
-        bills = state.bills_long_data
-    )
-    return data
+    response = {
+        'state_bills':state.bills_long_data
+    }
+    return response

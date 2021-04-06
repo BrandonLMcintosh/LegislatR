@@ -8,4 +8,7 @@ politicians = Blueprint("politicians", __name__,
 @politicians.route('/<int:politician_id>')
 def get(politician_id):
     politician = Politician.get(politician_id)
-    return politician.data
+    response = {
+        'politician': politician.data
+    }
+    return response

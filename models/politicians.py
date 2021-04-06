@@ -79,7 +79,7 @@ class Politician(db.Model):
         if politician.updated and politician.full:
             return politician
         politician.update()
-        cls.get(id)
+        return cls.get(id)
 
     def request(self):
         response = requests.get(request_politician.substitute(id=self.id))
