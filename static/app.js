@@ -1,9 +1,16 @@
 document.addEventListener("DOMContentLoaded", async function () {
+  const apiURL = "http://localhost:5000/";
+  const billsPage = document.querySelector("#bills");
+  const statesPage = document.querySelector("#states");
+  const loginForm = document.querySelector("#login-form");
+  const registerForm = document.querySelector("#register-form");
   // Edits required
   class App {
-    constructor(pageStates, pageBills, user) {
+    constructor(pageStates, pageBills, pageAccount, user) {
       this.pageStates = pageStates;
       this.pageBills = pageBills;
+      this.pageAccount = pageAccount;
+      this.pages = [this.pageStates, this.pageBills, this.pageAccount];
       this.user = user;
     }
 
@@ -13,28 +20,34 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     };
 
-    init = function () {
+    init = async function () {
+      console.log("initializing pages");
       for (let page of this.pages) {
-        page.init();
+        await page.init();
       }
     };
 
     // Needs edit
-    loadPage = async function (pageID = "#account") {
+    loadPage = async function (page = "account") {
       this.hideAll();
-      await populateInitialInfo();
-      if (!logged_in() && pageID == "#bills") {
-        pageID = "#account";
+      await this.init();
+      if (!this.user.loggedIn() && page == "bills") {
+        page = "account";
       }
 
-      if (logged_in()) {
+      if (LGSLTR.user.loggedIn()) {
         await populateUserData();
       }
-      if (pageID == "#logout") {
-        return await logout();
+
+      if (page == "account") {
+        this.pageAccount.unhide();
+      } else if (page == "bills") {
+        this.pageBills.unhide();
+      } else if (page == "states") {
+        this.pageStates.unhide();
+      } else if (page == "logout") {
+        this.user.logout();
       }
-      const contentArea = document.querySelector(pageID);
-      contentArea.style.display = "flex";
     };
   }
 
@@ -54,46 +67,34 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     // Needs finished
     init = async function () {
-      for (let column of this.columns) {
+      for (let column of Object.values(this.columns)) {
         column.init();
       }
     };
   }
 
   // Edits required
-  class StatesPage extends Page {
+  class PageStates extends Page {
     constructor(selector, columns = {}) {
       super(selector, columns);
     }
 
     // Needs edit
-    populateStates = async function () {
-      const stateSelect = document.querySelector("#register-form-state-select");
-      const statesPageColumn = document.querySelector("#states-list");
-      const response = await axios.get(apiURL + "states/list");
-      const states = response.data;
-      for (let state of states.data) {
-        const stateOption = document.createElement("option");
-        stateOption.value = state.id;
-        stateOption.innerHTML = state.code;
-
-        const stateDiv = document.createElement("div");
-        stateDiv.classList.add("flex-column-item");
-
-        stateSelect.appendChild(stateOption);
-        statesPageColumn.appendChild(stateDiv);
+    init = async function () {
+      for (let column of Object.values(columns)) {
+        column.init();
       }
     };
   }
 
   // Edits required
-  class BillsPage extends Page {
+  class PageBills extends Page {
     constructor(selector, columns = {}) {
       super(selector, columns);
     }
 
     // Needs edit
-    populateBills = async function (stateID, parentColumn) {
+    populateStateBills = async function (stateID) {
       response = await axios.get(apiURL + `states/${stateID}/bills`);
       bills = response.data.bills;
       for (let bill of bills) {
@@ -103,10 +104,24 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
 
     // Needs finished
-    populateTags = async function (userID) {};
+    populateTags = async function (user) {};
 
     // Needs finished
-    populateBillsFollowing = async function (userID) {};
+    populateBillsFollowing = async function (user) {};
+
+    populateUserData = async function (user) {};
+  }
+
+  class PageAccounts extends Page {
+    constructor(selector, columns = {}) {
+      super(selector, columns);
+    }
+
+    init = async function () {
+      response = await axios.get(apiURL + "states/list");
+      data = response.data;
+      console.log(data);
+    };
   }
 
   // Edits Required
@@ -118,9 +133,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       tags_following = [],
       bills_following = [],
       comments = [],
-      liked_comments = [],
+      liked_comments = []
       //Not working at global scope
-      apiURL = apiURL
     ) {
       this.id = id;
       this.username = username;
@@ -220,17 +234,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Edits required. Class may need to be more specific
   class Column {
-    constructor(selector, url, items = []) {
+    constructor(selector, items = []) {
       this._element = document.getElementById(selector);
-      this.apiURL = apiURL + url;
       this.items = items;
     }
-
-    init = async function () {
-      response = await axios.get(apiURL);
-      data = response.data;
-      return data;
-    };
 
     toggleBackButtons = function () {
       const backButtons = document.querySelectorAll(".flex-column-back");
@@ -238,6 +245,91 @@ document.addEventListener("DOMContentLoaded", async function () {
         backButton.classList.toggle("invisible");
       }
     };
+  }
+
+  class BillsFollowing extends Column {
+    constructor(selector, items = [], url) {
+      super(selector, items);
+      this.apiURL = apiURL + "";
+    }
+
+    init = async function () {};
+  }
+
+  class BillsState extends Column {
+    constructor(selector, items = [], url) {
+      super(selector, items);
+      this.apiURL = apiURL + url;
+    }
+
+    init = async function () {};
+  }
+
+  class BillsTags extends Column {
+    constructor(selector, items = [], url) {
+      super(selector, items);
+      this.apiURL = apiURL + url;
+    }
+
+    init = async function () {};
+  }
+
+  class AccountLogin extends Column {
+    constructor(selector, items = [], url = "user/login") {
+      super(selector, items);
+      this.apiURL = apiURL + url;
+    }
+
+    init = async function () {};
+  }
+
+  class AccountRegister extends Column {
+    constructor(selector, items = [], url = "user/register") {
+      super(selector, items);
+      this.apiURL = apiURL + url;
+    }
+
+    init = async function () {
+      const stateSelect = document.querySelector("#register-form-state-select");
+      const response = await axios.get(apiURL + "states/list");
+      const states = response.data;
+      console.log(states);
+      for (let state of states.data) {
+        const stateOption = document.createElement("option");
+        stateOption.value = state.id;
+        stateOption.innerHTML = state.code;
+        stateSelect.appendChild(stateOption);
+      }
+    };
+  }
+
+  class StatesList extends Column {
+    constructor(selector, items = [], url = "states/list") {
+      super(selector, items);
+      this.apiURL = apiURL + url;
+    }
+
+    init = async function () {
+      response = await axios.get(apiURL);
+      const states = response.data;
+      for (let state of states.data) {
+        let new_state = new State(
+          state.id,
+          state.code,
+          state.name,
+          state.full,
+          state.url,
+          state.politicians,
+          state.bills
+        );
+        this.items.append(new_state);
+        this._element.appendChild(new_state.buildElement());
+      }
+    };
+  }
+
+  class StatesInfo extends Column{
+    constructor(selector, items = [], id)
   }
 
   //Edits required
@@ -262,7 +354,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       container.id = this.code;
       container.dataset.id = this.id;
       container.innerHTML = this.name;
-
       return container;
     }
 
@@ -363,34 +454,24 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   const user = new User();
-  const apiURL = "http://localhost:5000/";
+  const bills = new PageBills("bills");
+  bills.columns.following = new BillsFollowing("bills-following");
+  bills.columns.state = new BillsState("bills-state");
+  bills.columns.tags = new BillsTags("bills-tags");
+  const states = new PageStates("states");
+  states.columns.list = new StatesList("states-list", "states/list");
+  states.columns.info = new StatesInfo("states-info");
+  const account = new PageAccounts("account");
+  account.columns.login = new AccountLogin("account-login");
+  account.columns.register = new AccountRegister("account-register");
+  const LGSLTR = new App(states, bills, account, user);
 
-  const bills = new Page("bills");
-  bills.following = new Column("bills-following");
-  bills.state = new Column("bills-state");
-  bills.tags = new Column("bills-tags");
-
-  const states = new Page("states");
-  states.list = new Column("states-list");
-  states.info = new Column("states-info");
-
-  const LGSLTR = new App(states, bills, user);
-
-  const billsPage = document.querySelector("#bills");
-  const statesPage = document.querySelector("#states");
-  const loginForm = document.querySelector("#login-form");
-  const registerForm = document.querySelector("#register-form");
-
-  // PageIDs no longer exists. fix this.
   window.addEventListener("hashchange", async function () {
     hash = location.hash;
-    if (pageIDs.includes(hash)) {
-      return loadPage(hash);
-    }
-    if (hash == "#logout") {
-      await logout();
-    }
+    page = hash.slice(1);
+    LGSLTR.loadPage(page);
   });
+
   // Make edits to fit in the class functions
   billsPage.addEventListener("click", function (evt) {
     const parent = evt.target.parentNode;
@@ -436,7 +517,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   if (LGSLTR.user.loggedIn()) {
-    await LGSLTR.loadPage("#bills");
+    await LGSLTR.loadPage("bills");
   } else {
     await LGSLTR.loadPage();
   }
