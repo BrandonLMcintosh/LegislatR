@@ -38,9 +38,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       if (authenticated) {
         page = "bills";
-        console.log("starting populate");
+
         await this.pageBills.populate(this.user);
-        console.log("done!");
       }
 
       if (page == "account") {
@@ -93,9 +92,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     populate = async function (user) {
-      console.log("step 1");
       for (let column of Object.values(this.columns)) {
-        console.log(column);
         await column.populate(user);
       }
     };
@@ -220,14 +217,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (userID != "undefined") {
         this.updateURL = apiURL + `user/${userID}`;
         const result = await this.update();
-        console.log("finished updating");
+
         if (result == "error") {
           sessionStorage.removeItem("userID");
           return false;
         }
-        console.log("unhiding logout nav");
+
         logoutNav.classList.remove("hidden");
-        console.log("hiding account nav");
+
         accountNav.classList.add("hidden");
         return true;
       }
@@ -235,23 +232,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
 
     update = async function () {
-      console.log("updating user in login check");
       const response = await axios.get(this.updateURL);
       const data = response.data;
-      console.log(data);
+
       if (data.error) {
         return "error";
       }
-      console.log("user is valid");
+
       const user = data.user;
       this.patch(user);
     };
 
     patch = function (user) {
-      console.log("patching user information");
       sessionStorage.setItem("userID", user.id);
-      console.log("set user id in session");
-      console.log(sessionStorage.getItem("userID"));
+
       this.id = user.id;
       this.username = user.username;
       this.state = user.state;
@@ -260,8 +254,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.comments = user.comments;
       this.liked_comments = user.liked_comments;
       this.updateURL = apiURL + `user/${this.id}`;
-      console.log(this);
-      console.log("finished patching user");
     };
 
     clear = function () {
@@ -310,9 +302,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     populate = async function (user) {
-      console.log("bills following");
       const bills = user.bills_following;
-      console.log(bills);
+
       for (let bill of bills) {
         newBill = new Bill(bill.id);
         await newBill.populate();
@@ -343,7 +334,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         apiURL + `states/${user.state.id}/bills`
       );
       const bills = response.data.state_bills;
-      console.log(bills);
+
       for (let bill of bills) {
         const abstract = bill.abstract;
         const actions = bill.actions;
@@ -357,7 +348,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         const title = bill.title;
         const url = bill.url;
 
-        console.log("locating bill " + bill.id);
         const newBill = new Bill(
           id,
           title,
@@ -394,9 +384,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.apiURL = apiURL + url;
     }
 
-    populate = async function (user) {
-      console.log("bills tags");
-    };
+    populate = async function (user) {};
 
     clear = function () {
       const tagsFollowing = document
@@ -608,7 +596,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     populate = async function (billID) {
       const response = await axios.get(this.apiURL);
       const data = response.data;
-      console.log(data);
     };
   }
 
