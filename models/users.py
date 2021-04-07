@@ -62,13 +62,6 @@ class User(db.Model):
     def bills_following_data(self):
         data = []
         for bill in self.bills_following:
-            data.append(bill.id)
-        return data
-
-    @property
-    def bills_following_long_data(self):
-        data = []
-        for bill in self.bills_following:
             data.append(bill.data)
         return data
 

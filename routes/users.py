@@ -35,8 +35,11 @@ def logout():
 
 @users.route('/<int:user_id>', methods=["GET"])
 def get(user_id):
-    user = User.get(user_id=session['user_id'])
-    response = {
-        'user': user.data
-    }
-    return response
+    if User.is_logged_in():
+        user = User.get(user_id=user_id)
+        response = {
+            'user': user.data
+        }
+        return response
+    return User.authentication_error()
+    

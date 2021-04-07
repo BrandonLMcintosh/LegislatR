@@ -16,6 +16,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///LGSLTR'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_POOL_SIZE'] = 200
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = 400
 app.config['SECRET_KEY'] = secret_key
 
 db.app = app

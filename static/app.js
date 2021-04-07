@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const loginForm = document.querySelector("#login-form");
   const registerForm = document.querySelector("#register-form");
   // Edits required
+
   class App {
     constructor(pageStates, pageBills, pageAccount, user) {
       this.pageStates = pageStates;
@@ -21,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
 
     init = async function () {
-      console.log("initializing pages");
       for (let page of this.pages) {
         await page.init();
       }
@@ -31,12 +31,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     loadPage = async function (page = "account") {
       this.hideAll();
       await this.init();
-      if (!this.user.loggedIn() && page == "bills") {
+      const authenticated = await this.user.loggedIn();
+      if (!authenticated && page == "bills") {
         page = "account";
       }
 
-      if (LGSLTR.user.loggedIn()) {
-        await populateUserData();
+      if (authenticated) {
+        page = "bills";
+        console.log("starting populate");
+        await this.pageBills.populate(this.user);
+        console.log("done!");
       }
 
       if (page == "account") {
@@ -68,7 +72,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Needs finished
     init = async function () {
       for (let column of Object.values(this.columns)) {
-        column.init();
+        if (column.init) {
+          await column.init();
+        }
       }
     };
   }
@@ -78,13 +84,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     constructor(selector, columns = {}) {
       super(selector, columns);
     }
-
-    // Needs edit
-    init = async function () {
-      for (let column of Object.values(columns)) {
-        column.init();
-      }
-    };
   }
 
   // Edits required
@@ -93,35 +92,19 @@ document.addEventListener("DOMContentLoaded", async function () {
       super(selector, columns);
     }
 
-    // Needs edit
-    populateStateBills = async function (stateID) {
-      response = await axios.get(apiURL + `states/${stateID}/bills`);
-      bills = response.data.bills;
-      for (let bill of bills) {
-        const billElement = createInitialBillElement(bill);
-        parentColumn.appendChild(billElement);
+    populate = async function (user) {
+      console.log("step 1");
+      for (let column of Object.values(this.columns)) {
+        console.log(column);
+        await column.populate(user);
       }
     };
-
-    // Needs finished
-    populateTags = async function (user) {};
-
-    // Needs finished
-    populateBillsFollowing = async function (user) {};
-
-    populateUserData = async function (user) {};
   }
 
   class PageAccounts extends Page {
     constructor(selector, columns = {}) {
       super(selector, columns);
     }
-
-    init = async function () {
-      response = await axios.get(apiURL + "states/list");
-      data = response.data;
-      console.log(data);
-    };
   }
 
   // Edits Required
@@ -145,67 +128,73 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.liked_comments = liked_comments;
       this.registerURL = apiURL + "user/register";
       this.loginURL = apiURL + "user/login";
+      this.updateURL = apiURL + `user/${this.id}`;
+      this.logoutURL = apiURL + "user/logout";
     }
 
     login = async function () {
-      loginUsername = document.querySelector("#login-form-username");
-      loginPassword = document.querySelector("#login-form-password");
-      loginError = document.querySelector("#login-form-error");
+      const loginUsername = document.querySelector("#login-form-username");
+      const loginPassword = document.querySelector("#login-form-password");
+      const loginError = document.querySelector("#login-form-error");
 
-      username = loginUsername.value;
-      password = loginPassword.value;
+      const username = loginUsername.value;
+      const password = loginPassword.value;
 
-      response = await axios.post(this.loginURL, {
+      const response = await axios.post(this.loginURL, {
         username: username,
         password: password,
       });
 
-      data = response.data.data;
+      const data = response.data;
       if (data.error) {
         return (loginError.innerHTML = data.error);
       }
 
       loginError.innerHTML = null;
-
-      sessionStorage.setItem("userID", data.user_id);
+      const user = data.user;
+      this.patch(user);
 
       loginUsername.value = null;
       loginPassword.value = null;
-
-      user_response = await axios.get(apiURL + `user/${getUserID()}`);
-      user = user_response.data;
 
       location.hash = "";
       location.hash = "#bills";
     };
 
     register = async function () {
-      registerUsername = document.querySelector("#register-form-username");
-      registerPassword = document.querySelector("#register-form-password");
-      registerPhone = document.querySelector("#register-form-phone");
-      registerState = document.querySelector("#register-form-state-select");
-      registerError = document.querySelector("#register-form-error");
+      const registerUsername = document.querySelector(
+        "#register-form-username"
+      );
+      const registerPassword = document.querySelector(
+        "#register-form-password"
+      );
+      const registerPhone = document.querySelector("#register-form-phone");
+      const registerState = document.querySelector(
+        "#register-form-state-select"
+      );
+      const registerError = document.querySelector("#register-form-error");
 
       const username = registerUsername.value;
       const password = registerPassword.value;
       const phone = registerPhone.value;
       const state = registerState.value;
 
-      response = await axios.post(this.registerURL, {
+      const response = await axios.post(this.registerURL, {
         username: username,
         password: password,
         phone: phone,
         state: state,
       });
 
-      data = response.data;
+      const data = response.data;
+
       if (data.error) {
         return (registerError.innerHTML = data.error);
       }
 
       registerError.innerHTML = null;
-
-      sessionStorage.setItem("userID", data.user_id);
+      const user = data.user;
+      this.patch(user);
 
       registerUsername.value = null;
       registerPassword.value = null;
@@ -216,20 +205,86 @@ document.addEventListener("DOMContentLoaded", async function () {
       location.hash = "#bills";
     };
 
-    // Needs re-implemented
-    logout = async function () {};
+    logout = async function () {
+      const response = await axios.get(logoutURL);
+      this.clear();
+    };
 
-    loggedIn = function () {
+    loggedIn = async function () {
       const userID = sessionStorage.getItem("userID");
-      if (userID) {
+      if (!userID) {
+        return false;
+      }
+      const logoutNav = document.querySelector("#nav-logout").parentElement;
+      const accountNav = document.querySelector("#nav-account").parentElement;
+      if (userID != "undefined") {
+        this.updateURL = apiURL + `user/${userID}`;
+        const result = await this.update();
+        console.log("finished updating");
+        if (result == "error") {
+          sessionStorage.removeItem("userID");
+          return false;
+        }
+        console.log("unhiding logout nav");
         logoutNav.classList.remove("hidden");
+        console.log("hiding account nav");
         accountNav.classList.add("hidden");
         return true;
       }
       return false;
     };
 
-    clear = async function () {};
+    update = async function () {
+      console.log("updating user in login check");
+      const response = await axios.get(this.updateURL);
+      const data = response.data;
+      console.log(data);
+      if (data.error) {
+        return "error";
+      }
+      console.log("user is valid");
+      const user = data.user;
+      this.patch(user);
+    };
+
+    patch = function (user) {
+      console.log("patching user information");
+      sessionStorage.setItem("userID", user.id);
+      console.log("set user id in session");
+      console.log(sessionStorage.getItem("userID"));
+      this.id = user.id;
+      this.username = user.username;
+      this.state = user.state;
+      this.tags_following = user.tags_following;
+      this.bills_following = user.bills_following;
+      this.comments = user.comments;
+      this.liked_comments = user.liked_comments;
+      this.updateURL = apiURL + `user/${this.id}`;
+      console.log(this);
+      console.log("finished patching user");
+    };
+
+    clear = function () {
+      sessionStorage.removeItem("userID");
+      this.id = null;
+      this.username = null;
+      this.state = null;
+      this.tags_following = [];
+      this.bills_following = [];
+      this.comments = [];
+      this.liked_comments = [];
+
+      for (let column of Object.values(LGSLTR.bills.columns)) {
+        column.clear();
+      }
+
+      for (let bill of stateBills) {
+        bill.remove();
+      }
+      for (let tag of tagsFollowing) {
+        tag.remove();
+      }
+    };
   }
 
   // Edits required. Class may need to be more specific
@@ -247,31 +302,111 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
+  // Needs INIT
   class BillsFollowing extends Column {
     constructor(selector, items = [], url) {
       super(selector, items);
       this.apiURL = apiURL + "";
     }
 
-    init = async function () {};
+    populate = async function (user) {
+      console.log("bills following");
+      const bills = user.bills_following;
+      console.log(bills);
+      for (let bill of bills) {
+        newBill = new Bill(bill.id);
+        await newBill.populate();
+      }
+    };
+
+    clear = function () {
+      const bills = document
+        .querySelector("#bills-following")
+        .querySelectorAll(".flex-column-item");
+
+      for (let bill of bills) {
+        bill.remove();
+      }
+      this.items = [];
+    };
   }
 
+  // Needs INIT
   class BillsState extends Column {
     constructor(selector, items = [], url) {
       super(selector, items);
       this.apiURL = apiURL + url;
     }
 
-    init = async function () {};
+    populate = async function (user) {
+      const response = await axios.get(
+        apiURL + `states/${user.state.id}/bills`
+      );
+      const bills = response.data.state_bills;
+      console.log(bills);
+      for (let bill of bills) {
+        const abstract = bill.abstract;
+        const actions = bill.actions;
+        const comments = bill.comments;
+        const full = bill.full;
+        const id = bill.id;
+        const identifier = bill.identifier;
+        const sponsors = bill.sponsors;
+        const state = bill.state;
+        const tags = bill.tags;
+        const title = bill.title;
+        const url = bill.url;
+
+        console.log("locating bill " + bill.id);
+        const newBill = new Bill(
+          id,
+          title,
+          identifier,
+          full,
+          abstract,
+          url,
+          state,
+          tags,
+          sponsors,
+          actions,
+          comments
+        );
+        this.items.append(newBill);
+        newBill.create();
+      }
+    };
+
+    clear = function () {
+      const stateBills = document
+        .querySelector("#bills-state")
+        .querySelectorAll(".flex-column-item");
+      for (let bill of stateBills) {
+        bill.remove();
+      }
+      this.items = [];
+    };
   }
 
+  // Needs INIT
   class BillsTags extends Column {
     constructor(selector, items = [], url) {
       super(selector, items);
       this.apiURL = apiURL + url;
     }
 
-    init = async function () {};
+    populate = async function (user) {
+      console.log("bills tags");
+    };
+
+    clear = function () {
+      const tagsFollowing = document
+        .querySelector("#bills-tags")
+        .querySelectorAll(".flex-column-item");
+      for (let tag in tagsFollowing) {
+        tag.remove();
+      }
+      this.items = [];
+    };
   }
 
   class AccountLogin extends Column {
@@ -279,8 +414,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       super(selector, items);
       this.apiURL = apiURL + url;
     }
-
-    init = async function () {};
   }
 
   class AccountRegister extends Column {
@@ -292,13 +425,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     init = async function () {
       const stateSelect = document.querySelector("#register-form-state-select");
       const response = await axios.get(apiURL + "states/list");
-      const states = response.data;
-      console.log(states);
-      for (let state of states.data) {
+      const states = response.data.states;
+      for (let state of states) {
         const stateOption = document.createElement("option");
         stateOption.value = state.id;
         stateOption.innerHTML = state.code;
-        stateSelect.appendChild(stateOption);
+        stateSelect.prepend(stateOption);
       }
     };
   }
@@ -310,9 +442,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     init = async function () {
-      response = await axios.get(apiURL);
-      const states = response.data;
-      for (let state of states.data) {
+      const response = await axios.get(this.apiURL);
+      const states = response.data.states;
+      for (let state of states) {
         let new_state = new State(
           state.id,
           state.code,
@@ -322,14 +454,20 @@ document.addEventListener("DOMContentLoaded", async function () {
           state.politicians,
           state.bills
         );
-        this.items.append(new_state);
+        this.items.push(new_state);
         this._element.appendChild(new_state.buildElement());
       }
     };
   }
 
-  class StatesInfo extends Column{
-    constructor(selector, items = [], id)
+  class StatesInfo extends Column {
+    constructor(selector, items = [], id) {
+      super(selector, items);
+    }
+
+    init = async function () {};
+
+    populate = async function () {};
   }
 
   //Edits required
@@ -365,12 +503,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   class Bill {
     constructor(
       id,
-      title,
-      identifier,
-      full,
+      title = null,
+      identifier = null,
+      full = null,
       abstract = null,
       url = null,
-      state,
+      state = null,
       tags = [],
       sponsors = [],
       actions = {},
@@ -378,7 +516,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     ) {
       this.id = id;
       this.title = title;
-      (this.identifier = identifier), (this.full = full);
+      this.identifier = identifier;
+      this.full = full;
       this.abstract = abstract;
       this.webURL = url;
       this.state = state;
@@ -392,28 +531,57 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Needs edit
     create = function () {
       const container = document.createElement("div");
-      container.dataset.id = bill.id;
+      container.dataset.id = this.id;
+      container.classList.add("flex-column-item");
 
       const title = document.createElement("h3");
-      title.innerHTML = bill.title;
+      title.innerHTML = this.title;
+      title.classList.add("bill-title");
 
       const abstract = document.createElement("p");
-      abstract.innerHTML = bill.abstract;
+      abstract.innerHTML = this.abstract;
+      abstract.classList.toggle("hidden");
+      abstract.classList.add("bill-abstract");
 
       const identifier = document.createElement("h2");
-      identifier.innerHTML = bill.abstract;
+      identifier.innerHTML = this.identifier;
+      identifier.classList.add("bill-identifier");
 
       const sponsorList = document.createElement("ul");
+      for (let sponsor of this.sponsors) {
+        const sponsorLI = document.createElement("li");
+        sponsorLI.innerHTML = sponsor.name;
+        sponsorLI.classList.append("bill-sponsor");
+        sponsorList.appendChild(sponsorLI);
+      }
       sponsorList.classList.toggle("hidden");
+      sponsorsList.classList.add("bill-sponsors-list");
 
       const commentList = document.createElement("ul");
+      commentList.classList.add("bill-comments-list");
+      for (let comment of this.comments) {
+        const commentLI = document.createElement("li");
+        commentLI.classList.add("bill-comment");
+        const commentText = document.createElement("p");
+        const commentUser = document.createElement("p");
+        const commentLikes = document.createElement("p");
+        commentText.innerHTML = comment.text;
+        commentText.classList.add("bill-comment-text");
+        commentUser.innerHTML = comment.user;
+        commentUser.classList.add("bill-comment-user");
+        commentLikes.innerHTML = comment.likes;
+        commentLikes.classList.add("bill-comment-likes");
+        commentLI.appendChild(commentText);
+        commentLI.appendChild(commentUser);
+        commentLI.appendChild(commentLikes);
+      }
       commentList.classList.toggle("hidden");
 
       const tagList = document.createElement("p");
       tagList.appendChild();
 
       const follow = document.createElement("button");
-      if (user.bills_following.contains(this.id)) {
+      if (LGSLTR.user.bills_following.contains(this.id)) {
         follow.innerHTML = "unfollow";
         follow.classList.toggle("hidden");
         follow.classList.add("unfollow");
@@ -437,9 +605,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     toggleFollow = async function () {};
 
     // Needs edit
-    populateBill = async function (billID) {
-      response = await axios.get(apiURL + `bills/${billID}`);
-      data = response.data.data;
+    populate = async function (billID) {
+      const response = await axios.get(this.apiURL);
+      const data = response.data;
       console.log(data);
     };
   }
@@ -459,7 +627,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   bills.columns.state = new BillsState("bills-state");
   bills.columns.tags = new BillsTags("bills-tags");
   const states = new PageStates("states");
-  states.columns.list = new StatesList("states-list", "states/list");
+  states.columns.list = new StatesList("states-list", [], "states/list");
   states.columns.info = new StatesInfo("states-info");
   const account = new PageAccounts("account");
   account.columns.login = new AccountLogin("account-login");
@@ -516,9 +684,5 @@ document.addEventListener("DOMContentLoaded", async function () {
     LGSLTR.user.register();
   });
 
-  if (LGSLTR.user.loggedIn()) {
-    await LGSLTR.loadPage("bills");
-  } else {
-    await LGSLTR.loadPage();
-  }
+  LGSLTR.loadPage();
 });
