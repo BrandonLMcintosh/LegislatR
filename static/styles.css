@@ -10,6 +10,10 @@
   --base-transition: 0.5s cubic-bezier(0.29, 0.01, 0.1, 1);
 }
 
+html::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   position: relative;
   min-height: 100vh;
@@ -111,6 +115,10 @@ div#page-content {
   transition: flex-basis var(--base-transition);
 }
 
+.flex-column::-webkit-scrollbar {
+  display: none;
+}
+
 .flex-column-header {
   font-family: "Pathway Gothic One", sans-serif;
   text-align: center;
@@ -181,11 +189,29 @@ div#page-content {
   overflow: scroll;
 }
 
+#states-list::-webkit-scrollbar {
+  display: none;
+}
+
 #states-list .flex-column-item {
   min-height: 50px;
 }
 
 /* bills page */
+#bills-state {
+  overflow: scroll;
+}
+#bills-state::-webkit-scrollbar {
+  display: none;
+}
+
+#bills-state > .flex-column-item {
+  overflow: hidden;
+}
+
+#bills > .flex-column {
+  width: 32%;
+}
 
 /* account page */
 
@@ -195,8 +221,12 @@ div#page-content {
   display: none;
 }
 
+.scaled-up {
+  width: 0%;
+}
+
 .scaled-down {
-  flex-basis: 0%;
+  width: 0%;
 }
 
 .invisible {

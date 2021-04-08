@@ -37,8 +37,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
       if (authenticated) {
-        page = "bills";
-
         await this.pageBills.populate(this.user);
       }
 
@@ -94,6 +92,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     populate = async function (user) {
       for (let column of Object.values(this.columns)) {
         await column.populate(user);
+      }
+    };
+
+    toggleBackButtons = function () {
+      const backButtons = document.querySelectorAll(".flex-column-back");
+      for (let backButton of backButtons) {
+        backButton.classList.toggle("invisible");
       }
     };
   }
@@ -285,13 +290,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       this._element = document.getElementById(selector);
       this.items = items;
     }
-
-    toggleBackButtons = function () {
-      const backButtons = document.querySelectorAll(".flex-column-back");
-      for (let backButton of backButtons) {
-        backButton.classList.toggle("invisible");
-      }
-    };
   }
 
   // Needs INIT
@@ -361,8 +359,9 @@ document.addEventListener("DOMContentLoaded", async function () {
           actions,
           comments
         );
-        this.items.append(newBill);
-        newBill.create();
+        this.items.push(newBill);
+        const billElement = newBill.create();
+        this._element.appendChild(billElement);
       }
     };
 
@@ -443,7 +442,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           state.bills
         );
         this.items.push(new_state);
-        this._element.appendChild(new_state.buildElement());
+        this._element.appendChild(new_state.create());
       }
     };
   }
@@ -455,7 +454,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     init = async function () {};
 
-    populate = async function () {};
+    populate = async function (stateID) {};
   }
 
   //Edits required
@@ -475,13 +474,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       return this.buildElement();
     }
 
-    buildElement() {
+    create = function () {
       const container = document.createElement("div");
       container.id = this.code;
       container.dataset.id = this.id;
       container.innerHTML = this.name;
+      container.classList.add("flex-column-item");
+
       return container;
-    }
+    };
 
     //Needs finished
     expand() {}
@@ -499,8 +500,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       state = null,
       tags = [],
       sponsors = [],
-      actions = {},
-      comments = {}
+      actions = [],
+      comments = []
     ) {
       this.id = id;
       this.title = title;
@@ -516,86 +517,160 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.apiURL = apiURL + `bills/${this.id}`;
     }
 
-    // Needs edit
-    create = function () {
-      const container = document.createElement("div");
-      container.dataset.id = this.id;
-      container.classList.add("flex-column-item");
+    createIdentifier = function () {
+      const identifier = document.createElement("h6");
+      identifier.style.fontWeight = "bold";
+      identifier.innerHTML = this.identifier;
+      identifier.classList.add("bill-identifier");
 
-      const title = document.createElement("h3");
+      return identifier;
+    };
+
+    createTitle = function () {
+      const title = document.createElement("p");
       title.innerHTML = this.title;
       title.classList.add("bill-title");
 
+      return title;
+    };
+
+    createAbstract = function () {
       const abstract = document.createElement("p");
       abstract.innerHTML = this.abstract;
       abstract.classList.toggle("hidden");
       abstract.classList.add("bill-abstract");
 
-      const identifier = document.createElement("h2");
-      identifier.innerHTML = this.identifier;
-      identifier.classList.add("bill-identifier");
+      return abstract;
+    };
 
-      const sponsorList = document.createElement("ul");
+    createSponsorsList = function () {
+      const sponsorsList = document.createElement("ul");
+      sponsorsList.classList.toggle("hidden");
+      sponsorsList.classList.add("bill-sponsors-list");
+
       for (let sponsor of this.sponsors) {
         const sponsorLI = document.createElement("li");
         sponsorLI.innerHTML = sponsor.name;
         sponsorLI.classList.append("bill-sponsor");
         sponsorList.appendChild(sponsorLI);
       }
-      sponsorList.classList.toggle("hidden");
-      sponsorsList.classList.add("bill-sponsors-list");
 
-      const commentList = document.createElement("ul");
-      commentList.classList.add("bill-comments-list");
-      for (let comment of this.comments) {
-        const commentLI = document.createElement("li");
-        commentLI.classList.add("bill-comment");
-        const commentText = document.createElement("p");
-        const commentUser = document.createElement("p");
-        const commentLikes = document.createElement("p");
-        commentText.innerHTML = comment.text;
-        commentText.classList.add("bill-comment-text");
-        commentUser.innerHTML = comment.user;
-        commentUser.classList.add("bill-comment-user");
-        commentLikes.innerHTML = comment.likes;
-        commentLikes.classList.add("bill-comment-likes");
-        commentLI.appendChild(commentText);
-        commentLI.appendChild(commentUser);
-        commentLI.appendChild(commentLikes);
+      return sponsorsList;
+    };
+
+    createCommentsList = function () {
+      const commentsList = document.createElement("ul");
+      commentsList.classList.add("bill-comments-list");
+      commentsList.classList.toggle("hidden");
+
+      if (this.comments) {
+        for (let comment of this.comments) {
+          const commentLI = document.createElement("li");
+          commentLI.classList.add("bill-comment");
+
+          const commentText = document.createElement("p");
+          commentText.innerHTML = comment.text;
+          commentText.classList.add("bill-comment-text");
+
+          const commentUser = document.createElement("p");
+          commentUser.innerHTML = comment.user;
+          commentUser.classList.add("bill-comment-user");
+
+          const commentLikes = document.createElement("p");
+          commentLikes.innerHTML = comment.likes;
+          commentLikes.classList.add("bill-comment-likes");
+
+          commentLI.appendChild(commentText);
+          commentLI.appendChild(commentUser);
+          commentLI.appendChild(commentLikes);
+
+          commentsList.appendChild(commentLI);
+        }
       }
-      commentList.classList.toggle("hidden");
 
-      const tagList = document.createElement("p");
-      tagList.appendChild();
+      return commentsList;
+    };
 
+    createTagsList = function () {
+      const tagsList = document.createElement("p");
+      tagsList.classList.add("bill-tags-list");
+      if (this.tags) {
+        for (let tag of this.tags) {
+          const tagSpan = document.createElement("span");
+          tagSpan.classList.add("bill-tag");
+          tagSpan.innerHTML = tag.name;
+
+          tagsList.appendChild(tagSpan);
+        }
+      }
+
+      return tagsList;
+    };
+
+    createFollow = function () {
       const follow = document.createElement("button");
-      if (LGSLTR.user.bills_following.contains(this.id)) {
+      const bills_following_ids = [];
+      for (let bill of LGSLTR.user.bills_following) {
+        bills_following_ids.push(bill.id);
+      }
+      if (bills_following_ids.includes(this.id)) {
         follow.innerHTML = "unfollow";
-        follow.classList.toggle("hidden");
         follow.classList.add("unfollow");
+        follow.classList.remove("follow");
+
+        return follow;
       }
       follow.innerHTML = "follow";
-      follow.classList.toggle("follow");
+      follow.classList.add("follow");
+      follow.classList.remove("unfollow");
 
+      return follow;
+    };
+
+    createURL = function () {
       const url = document.createElement("a");
       url.classList.toggle("hidden");
-      url.href = bill.url;
+      url.href = this.webURL;
 
-      container.appendChild(billElementIdentifier);
-      container.appendChild(billElementTitle);
-      container.appendChild(billElementAbstract);
+      return url;
+    };
+
+    // Needs edit
+    create = function () {
+      const container = document.createElement("div");
+      container.dataset.id = this.id;
+      container.classList.add("flex-column-item");
+
+      const identifier = this.createIdentifier();
+      const title = this.createTitle();
+      const abstract = this.createAbstract();
+      const sponsorsList = this.createSponsorsList();
+      const commentsList = this.createCommentsList();
+      const tagsList = this.createTagsList();
+
+      container.appendChild(identifier);
+      container.appendChild(title);
+      container.appendChild(abstract);
+      container.appendChild(sponsorsList);
+      container.appendChild(commentsList);
+      container.appendChild(tagsList);
 
       return container;
     };
 
-    expand = function () {};
+    expand = function () {
+      if (!this.full) {
+        this.update();
+      }
+    };
 
     toggleFollow = async function () {};
 
     // Needs edit
-    populate = async function (billID) {
+    update = async function (billID) {
       const response = await axios.get(this.apiURL);
       const data = response.data;
+      console.log(data);
     };
   }
 
@@ -634,18 +709,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (target.classList.contains("flex-column-header")) {
       parent.style.flexBasis = "100%";
       // Needs to reference column class
-      toggleBackButtons();
+      LGSLTR.pageBills.toggleBackButtons();
     }
 
     if (parent.classList.contains("flex-column-header")) {
       target.parentNode.parentNode.style.flexBasis = "100%";
       target.sibling;
-      toggleBackButtons();
+      LGSLTR.pageBills.toggleBackButtons();
     }
 
     if (target.classList.contains("flex-column-back")) {
-      target.parentNode.parentNode.style.flexBasis = "auto";
-      toggleBackButtons();
+      target.parentNode.parentNode.style.flexBasis = "32%";
+      LGSLTR.pageBills.toggleBackButtons();
     }
   });
 
