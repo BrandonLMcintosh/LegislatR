@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   const statesPage = document.querySelector("#states");
   const loginForm = document.querySelector("#login-form");
   const registerForm = document.querySelector("#register-form");
-  // Edits required
 
   class App {
     constructor(pageStates, pageBills, pageAccount, user) {
@@ -52,7 +51,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
-  // Edits required
   class Page {
     constructor(selector, columns = {}) {
       this.selector = selector;
@@ -76,14 +74,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
-  // Edits required
   class PageStates extends Page {
     constructor(selector, columns = {}) {
       super(selector, columns);
     }
   }
 
-  // Edits required
   class PageBills extends Page {
     constructor(selector, columns = {}) {
       super(selector, columns);
@@ -109,7 +105,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Edits Required
   class User {
     constructor(
       id = null,
@@ -284,7 +279,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
-  // Edits required. Class may need to be more specific
   class Column {
     constructor(selector, items = []) {
       this._element = document.getElementById(selector);
@@ -292,7 +286,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Needs INIT
   class BillsFollowing extends Column {
     constructor(selector, items = [], url) {
       super(selector, items);
@@ -303,8 +296,34 @@ document.addEventListener("DOMContentLoaded", async function () {
       const bills = user.bills_following;
 
       for (let bill of bills) {
-        newBill = new Bill(bill.id);
-        await newBill.populate();
+        const abstract = bill.abstract;
+        const actions = bill.actions;
+        const comments = bill.comments;
+        const full = bill.full;
+        const id = bill.id;
+        const identifier = bill.identifier;
+        const sponsors = bill.sponsors;
+        const state = bill.state;
+        const tags = bill.tags;
+        const title = bill.title;
+        const url = bill.url;
+
+        const newBill = new Bill(
+          id,
+          title,
+          identifier,
+          full,
+          abstract,
+          url,
+          state,
+          tags,
+          sponsors,
+          actions,
+          comments
+        );
+        this.items.push(newBill);
+        const billElement = newBill.create();
+        this._element.appendChild(billElement);
       }
     };
 
@@ -320,7 +339,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
-  // Needs INIT
   class BillsState extends Column {
     constructor(selector, items = [], url) {
       super(selector, items);
@@ -376,7 +394,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
-  // Needs INIT
   class BillsTags extends Column {
     constructor(selector, items = [], url) {
       super(selector, items);
@@ -457,7 +474,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     populate = async function (stateID) {};
   }
 
-  //Edits required
   class State {
     constructor(id, code, name, full, url, politicians = [], bills = []) {
       this.id = id;
@@ -488,7 +504,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     expand() {}
   }
 
-  //Edits required
   class Bill {
     constructor(
       id,
@@ -551,8 +566,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       for (let sponsor of this.sponsors) {
         const sponsorLI = document.createElement("li");
         sponsorLI.innerHTML = sponsor.name;
-        sponsorLI.classList.append("bill-sponsor");
-        sponsorList.appendChild(sponsorLI);
+        sponsorLI.classList.add("bill-sponsor");
+        sponsorsList.appendChild(sponsorLI);
       }
 
       return sponsorsList;
@@ -608,7 +623,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
 
     createFollow = function () {
-      const follow = document.createElement("button");
+      const follow = document.createElement("i");
       const bills_following_ids = [];
       for (let bill of LGSLTR.user.bills_following) {
         bills_following_ids.push(bill.id);
@@ -664,7 +679,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     };
 
-    toggleFollow = async function () {};
+    toggleFollow = async function () {
+      const response = await axios.post(apiURL + "/follow");
+      console.log(response.data);
+    };
 
     // Needs edit
     update = async function (billID) {
@@ -674,7 +692,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
   }
 
-  // Edits required
   class Tag {
     constructor(id, name, taggedBills = []) {
       this.id = id;
@@ -702,7 +719,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     LGSLTR.loadPage(page);
   });
 
-  // Make edits to fit in the class functions
   billsPage.addEventListener("click", function (evt) {
     const parent = evt.target.parentNode;
     const target = evt.target;
@@ -724,7 +740,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  // Make edits to fit in the class functions
   statesPage.addEventListener("click", function (evt) {
     const target = evt.target;
     const parent = target.parentNode;
