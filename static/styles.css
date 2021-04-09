@@ -159,7 +159,7 @@ div#page-content {
 }
 
 .flex-column-item {
-  display: grid;
+  /* display: grid; */
   min-height: 200px;
   margin-bottom: 0.2em;
   background-color: var(--layer1);
@@ -213,9 +213,56 @@ div#page-content {
   width: 32%;
 }
 
+.flex-column-item > .bill-identifier {
+  font-weight: bold;
+  margin: 0 auto;
+  margin-top: 4px;
+  display: inline;
+}
+
+.flex-column-item > .bill-title {
+}
+
+.flex-column-item > .bill-abstract {
+}
+
+.flex-column-item > .bill-sponsors-list {
+}
+
+.flex-column-item > .bill-comments-list {
+}
+
+.flex-column-item > .bill-tags-list {
+}
+
+.flex-column-item > .bill-toggle-follow {
+  transition: color var(--base-transition);
+  color: #0d5ed8;
+  display: inline;
+  float: right;
+}
+
+.flex-column-item > .bill-toggle-expand {
+  transition: transform var(--base-transition), color var(--base-transition);
+  display: inline;
+  color: #0d5ed8;
+  float: right;
+}
+
+.flex-column-item > .bill-toggle-expand:hover,
+.flex-column-item > .bill-toggle-follow:hover {
+  color: white;
+}
+.flex-column-item > .bill-url {
+}
+
 /* account page */
 
 /* JS Classes */
+
+.flip {
+  transform: rotate(180deg);
+}
 
 .hidden {
   display: none;

@@ -27,11 +27,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
 
     // Needs edit
-    loadPage = async function (page = "account") {
+    loadPage = async function (page = "bills") {
       this.hideAll();
       await this.init();
       const authenticated = await this.user.loggedIn();
       if (!authenticated && page == "bills") {
+        console.log("not logged in");
         page = "account";
       }
 
@@ -62,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       this._element.style.display = "none";
     }
     unhide() {
+      location.hash = this.selector;
       this._element.style.display = "flex";
     }
     // Needs finished
@@ -203,7 +205,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
 
     logout = async function () {
-      const response = await axios.get(logoutURL);
+      const response = await axios.get(this.logoutURL);
       this.clear();
     };
 
@@ -266,7 +268,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.comments = [];
       this.liked_comments = [];
 
-      for (let column of Object.values(LGSLTR.bills.columns)) {
+      for (let column of Object.values(LGSLTR.pageBills.columns)) {
         column.clear();
       }
 
@@ -534,7 +536,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     createIdentifier = function () {
       const identifier = document.createElement("h6");
-      identifier.style.fontWeight = "bold";
       identifier.innerHTML = this.identifier;
       identifier.classList.add("bill-identifier");
 
@@ -552,7 +553,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     createAbstract = function () {
       const abstract = document.createElement("p");
       abstract.innerHTML = this.abstract;
-      abstract.classList.toggle("hidden");
+      abstract.classList.add("extra");
       abstract.classList.add("bill-abstract");
 
       return abstract;
@@ -560,7 +561,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     createSponsorsList = function () {
       const sponsorsList = document.createElement("ul");
-      sponsorsList.classList.toggle("hidden");
+      sponsorsList.classList.add("extra");
       sponsorsList.classList.add("bill-sponsors-list");
 
       for (let sponsor of this.sponsors) {
@@ -576,7 +577,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     createCommentsList = function () {
       const commentsList = document.createElement("ul");
       commentsList.classList.add("bill-comments-list");
-      commentsList.classList.toggle("hidden");
+      commentsList.classList.add("extra");
 
       if (this.comments) {
         for (let comment of this.comments) {
@@ -622,29 +623,37 @@ document.addEventListener("DOMContentLoaded", async function () {
       return tagsList;
     };
 
+    createExpand = function () {
+      const expand = document.createElement("i");
+      expand.classList.add("bill-toggle-expand");
+      expand.classList.add("fas");
+      expand.classList.add("fa-chevron-circle-down");
+      return expand;
+    };
+
     createFollow = function () {
       const follow = document.createElement("i");
       const bills_following_ids = [];
+      follow.classList.add("bill-toggle-follow");
+      follow.classList.add("fas");
+
       for (let bill of LGSLTR.user.bills_following) {
         bills_following_ids.push(bill.id);
       }
       if (bills_following_ids.includes(this.id)) {
-        follow.innerHTML = "unfollow";
-        follow.classList.add("unfollow");
-        follow.classList.remove("follow");
-
+        follow.classList.add("fa-minus-circle");
         return follow;
       }
-      follow.innerHTML = "follow";
-      follow.classList.add("follow");
-      follow.classList.remove("unfollow");
+
+      follow.classList.add("fa-plus-circle");
 
       return follow;
     };
 
     createURL = function () {
       const url = document.createElement("a");
-      url.classList.toggle("hidden");
+      url.classList.add("extra");
+      url.classList.add("bill-url");
       url.href = this.webURL;
 
       return url;
@@ -657,6 +666,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       container.classList.add("flex-column-item");
 
       const identifier = this.createIdentifier();
+      const follow = this.createFollow();
+      const expand = this.createExpand();
       const title = this.createTitle();
       const abstract = this.createAbstract();
       const sponsorsList = this.createSponsorsList();
@@ -664,19 +675,38 @@ document.addEventListener("DOMContentLoaded", async function () {
       const tagsList = this.createTagsList();
 
       container.appendChild(identifier);
+      container.appendChild(expand);
+      container.appendChild(follow);
       container.appendChild(title);
       container.appendChild(abstract);
       container.appendChild(sponsorsList);
       container.appendChild(commentsList);
       container.appendChild(tagsList);
 
+      const extras = container.querySelectorAll(".extra");
+      for (let extra of extras) {
+        extra.classList.toggle("hidden");
+      }
+
+      this._element = container;
+
       return container;
     };
 
-    expand = function () {
+    toggleExpand = function () {
       if (!this.full) {
         this.update();
       }
+
+      const extras = this._element.querySelectorAll(".extra");
+
+      const expandToggle = this._element.querySelector(".bill-toggle-expand");
+
+      for (let extra of extras) {
+        extra.classList.toggle("hidden");
+      }
+      console.log("FLIP!");
+      expandToggle.classList.toggle("flip");
     };
 
     toggleFollow = async function () {
@@ -687,8 +717,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Needs edit
     update = async function (billID) {
       const response = await axios.get(this.apiURL);
-      const data = response.data;
-      console.log(data);
+      const data = response.data.bill;
+      this.abstract = data.abstract;
+      this.actions = data.actions;
+      this.comments = data.comments;
+      this.full = data.full;
+      this.identifier = data.identifier;
+      this.sponsors = data.sponsors;
+      this.state = data.state;
+      this.tags = data.tags;
+      this.title = data.title;
+      this.url = data.url;
+
+      this.console.log(data);
     };
   }
 
@@ -730,13 +771,28 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (parent.classList.contains("flex-column-header")) {
       target.parentNode.parentNode.style.flexBasis = "100%";
-      target.sibling;
       LGSLTR.pageBills.toggleBackButtons();
     }
 
     if (target.classList.contains("flex-column-back")) {
       target.parentNode.parentNode.style.flexBasis = "32%";
       LGSLTR.pageBills.toggleBackButtons();
+    }
+
+    if (target.classList.contains("bill-toggle-expand")) {
+      const id = target.parentNode.dataset.id;
+      const column = target.parentNode.parentNode.id;
+      if (column == "bills-following") {
+        const bill = LGSLTR.pageBills.columns.following.items.find(
+          (bill) => bill.id == id
+        );
+        bill.toggleExpand();
+      } else if (column == "bills-state") {
+        const bill = LGSLTR.pageBills.columns.state.items.find(
+          (bill) => bill.id == id
+        );
+        bill.toggleExpand();
+      }
     }
   });
 
