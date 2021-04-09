@@ -81,6 +81,11 @@ class Politician(db.Model):
         politician.update()
         return cls.get(id)
 
+    @classmethod
+    def get_all(cls):
+        politicians = cls.query.all()
+        return politicians
+
     def request(self):
         response = requests.get(request_politician.substitute(id=self.id))
         data = response.json()

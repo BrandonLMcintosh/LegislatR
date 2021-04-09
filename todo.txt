@@ -1,39 +1,4 @@
--Infinite, auto-populating scrollable columns
--Fix auto-column sizing
--prevent column header click events when column is expanded
--implement search bar with results for bills / states / tags
-
--politician model update functions in same format as state/bills - DONE
--Add updated_by in query search for request_state_bills - DONE
--finish bills routes - DONE
--Finish states/bills route - DONE
--Start testing routes in JSON in Insomnia - DONE
-     -Confirm all routes are working as intended - DONE
-
--Build front-end more
-     -style login/register form
-     -create logout button in nav
-
-
-added these CSS classes: 
-bill-title
-bill-identifier
-bill-abstract
-bill-url
-bill-state
-
-bill-tags-list
-bill-tag
-
-bill-sponsors-list
-bill-sponsor
-
-bill-actions-list
-bill-action
-
-bill-comments-list
-bill-comment
-
-last I was working on the follow button on the bill.create() function. 
+needs fixed - bills_following not populating. Error when unfollowing bill in that column: 
+     -Cannot read property toggleFollow of undefined (line 927)
      
 

@@ -103,11 +103,15 @@ class Bill(db.Model):
         for comment in self.comments:
             data.append(comment.data)
 
+        return data
+
     @property
     def actions_data(self):
         data = []
         for action in self.actions:
             data.append(action.data)
+
+        return data
 
     @ classmethod
     def get(cls, id):
@@ -133,32 +137,42 @@ class Bill(db.Model):
             db.session.add(new_action)
         db.session.commit()
 
-    def add_sponsors(self, sponsorships):
+    def add_sponsors(self, sponsorships, existing_sponsors_ids):
         for sponsor in sponsorships:
-            person = sponsor['person']
-            id = person['id']
-            name = person['name']
-            party = person['party']
-            title = person['current_role']['title']
-            sponsor = Politician(
-                id=id,
-                name=name,
-                title=title,
-                state_id=self.state_id
-            )
-            sponsor.add_party(party)
-            self.sponsors.append(sponsor)
+            if('person' in sponsor.keys()):
+                person = sponsor['person']
+                id = person['id']
+                name = person['name']
+                party = person['party']
+                title = person['current_role']['title']
+                if id not in existing_sponsors_ids:
+                    newSponsor = Politician(
+                        id=id,
+                        name=name,
+                        title=title,
+                        state_id=self.state_id
+                    )
+                    newSponsor.add_party(party)
+                    db.session.add(newSponsor)
+                    db.session.commit()
+                    self.sponsors.append(newSponsor)
 
 
 
 
     def patch(self, result):
-        self.abstract = result['abstracts'][0]['abstract'] if len(result['abstracts']) > 0 else ''
+        if 'abstracts' in result:
+            self.abstract = result['abstracts'][0]['abstract'] if len(result['abstracts']) > 0 else ''
         self.url = result['sources'][0]['url']
         actions = result['actions']
         sponsors = result['sponsorships']
         self.add_actions(actions)
-        self.add_sponsors(sponsors)
+        existing_sponsors = Politician.get_all()
+        existing_sponsors_ids = []
+        for sponsor in existing_sponsors:
+            existing_sponsors_ids.append(sponsor.id) 
+
+        self.add_sponsors(sponsors, existing_sponsors_ids)
 
     def update(self):
         result = self.request()

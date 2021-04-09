@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       await this.init();
       const authenticated = await this.user.loggedIn();
       if (!authenticated && page == "bills") {
-        console.log("not logged in");
         page = "account";
       }
 
@@ -242,6 +241,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
       const user = data.user;
+
       this.patch(user);
     };
 
@@ -255,7 +255,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.bills_following = user.bills_following;
       this.comments = user.comments;
       this.liked_comments = user.liked_comments;
-      this.updateURL = apiURL + `user/${this.id}`;
     };
 
     clear = function () {
@@ -536,7 +535,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     createIdentifier = function () {
       const identifier = document.createElement("h6");
-      identifier.innerHTML = this.identifier;
+      identifier.textContent = this.identifier;
       identifier.classList.add("bill-identifier");
 
       return identifier;
@@ -544,7 +543,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     createTitle = function () {
       const title = document.createElement("p");
-      title.innerHTML = this.title;
+      title.textContent = this.title;
       title.classList.add("bill-title");
 
       return title;
@@ -552,75 +551,113 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     createAbstract = function () {
       const abstract = document.createElement("p");
-      abstract.innerHTML = this.abstract;
+      abstract.textContent = "abstract: " + this.abstract;
       abstract.classList.add("extra");
       abstract.classList.add("bill-abstract");
 
       return abstract;
     };
 
+    createActionsList = function () {
+      const actionsDiv = document.createElement("div");
+      actionsDiv.classList.add("extra");
+      actionsDiv.classList.add("bill-actions");
+      actionsDiv.textContent = "Actions:";
+      const actionsList = document.createElement("ul");
+      actionsList.classList.add("bill-actions-list");
+
+      for (let action of this.actions) {
+        const actionLI = document.createElement("li");
+        const organization = document.createElement("p");
+        organization.textContent = "organization: " + action.organization;
+        const description = document.createElement("p");
+        description.textContent = "description: " + action.description;
+        const date = document.createElement("p");
+        date.textContent = "date: " + action.date;
+        actionLI.appendChild(organization);
+        actionLI.appendChild(description);
+        actionLI.appendChild(date);
+
+        actionsList.appendChild(actionLI);
+      }
+
+      actionsDiv.appendChild(actionsList);
+
+      return actionsDiv;
+    };
+
     createSponsorsList = function () {
+      const sponsorsDiv = document.createElement("div");
+      sponsorsDiv.classList.add("extra");
+      sponsorsDiv.classList.add("bill-sponsors");
+      sponsorsDiv.textContent = "Sponsors:";
       const sponsorsList = document.createElement("ul");
-      sponsorsList.classList.add("extra");
       sponsorsList.classList.add("bill-sponsors-list");
 
       for (let sponsor of this.sponsors) {
         const sponsorLI = document.createElement("li");
-        sponsorLI.innerHTML = sponsor.name;
+        sponsorLI.textContent = sponsor.name;
         sponsorLI.classList.add("bill-sponsor");
         sponsorsList.appendChild(sponsorLI);
       }
 
-      return sponsorsList;
+      sponsorsDiv.appendChild(sponsorsList);
+
+      return sponsorsDiv;
     };
 
     createCommentsList = function () {
+      const commentsDiv = document.createElement("div");
+      commentsDiv.classList.add("extra");
+      commentsDiv.classList.add("bill-comments");
+      commentsDiv.textContent = "Comments:";
       const commentsList = document.createElement("ul");
       commentsList.classList.add("bill-comments-list");
-      commentsList.classList.add("extra");
 
-      if (this.comments) {
-        for (let comment of this.comments) {
-          const commentLI = document.createElement("li");
-          commentLI.classList.add("bill-comment");
+      for (let comment of this.comments) {
+        const commentLI = document.createElement("li");
+        commentLI.classList.add("bill-comment");
 
-          const commentText = document.createElement("p");
-          commentText.innerHTML = comment.text;
-          commentText.classList.add("bill-comment-text");
+        const commentText = document.createElement("p");
+        commentText.textContent = comment.text;
+        commentText.classList.add("bill-comment-text");
 
-          const commentUser = document.createElement("p");
-          commentUser.innerHTML = comment.user;
-          commentUser.classList.add("bill-comment-user");
+        const commentUser = document.createElement("p");
+        commentUser.textContent = comment.user;
+        commentUser.classList.add("bill-comment-user");
 
-          const commentLikes = document.createElement("p");
-          commentLikes.innerHTML = comment.likes;
-          commentLikes.classList.add("bill-comment-likes");
+        const commentLikes = document.createElement("p");
+        commentLikes.textContent = comment.likes;
+        commentLikes.classList.add("bill-comment-likes");
 
-          commentLI.appendChild(commentText);
-          commentLI.appendChild(commentUser);
-          commentLI.appendChild(commentLikes);
+        commentLI.appendChild(commentText);
+        commentLI.appendChild(commentUser);
+        commentLI.appendChild(commentLikes);
 
-          commentsList.appendChild(commentLI);
-        }
+        commentsList.appendChild(commentLI);
       }
 
-      return commentsList;
+      commentsDiv.appendChild(commentsList);
+      return commentsDiv;
     };
 
     createTagsList = function () {
+      const tagsDiv = document.createElement("div");
+      tagsDiv.classList.add("extra");
+      tagsDiv.classList.add("bill-tags");
+      tagsDiv.textContent = "Tags: ";
       const tagsList = document.createElement("p");
       tagsList.classList.add("bill-tags-list");
-      if (this.tags) {
-        for (let tag of this.tags) {
-          const tagSpan = document.createElement("span");
-          tagSpan.classList.add("bill-tag");
-          tagSpan.innerHTML = tag.name;
+      for (let tag of this.tags) {
+        const tagSpan = document.createElement("span");
+        tagSpan.textContent = tag.name;
 
-          tagsList.appendChild(tagSpan);
-        }
+        tagsList.appendChild(tagSpan);
       }
 
-      return tagsList;
+      tagsDiv.appendChild(tagsList);
+
+      return tagsDiv;
     };
 
     createExpand = function () {
@@ -633,14 +670,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     createFollow = function () {
       const follow = document.createElement("i");
-      const bills_following_ids = [];
       follow.classList.add("bill-toggle-follow");
       follow.classList.add("fas");
 
-      for (let bill of LGSLTR.user.bills_following) {
-        bills_following_ids.push(bill.id);
-      }
-      if (bills_following_ids.includes(this.id)) {
+      if (this.isFollowed()) {
         follow.classList.add("fa-minus-circle");
         return follow;
       }
@@ -650,11 +683,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       return follow;
     };
 
-    createURL = function () {
+    createLink = function () {
       const url = document.createElement("a");
       url.classList.add("extra");
-      url.classList.add("bill-url");
+      url.classList.add("bill-link");
       url.href = this.webURL;
+      url.innerHTML = '<i class="fas fa-external-link-square-alt"></i>';
 
       return url;
     };
@@ -671,8 +705,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       const title = this.createTitle();
       const abstract = this.createAbstract();
       const sponsorsList = this.createSponsorsList();
+      const actionsList = this.createActionsList();
       const commentsList = this.createCommentsList();
       const tagsList = this.createTagsList();
+      const link = this.createLink();
 
       container.appendChild(identifier);
       container.appendChild(expand);
@@ -680,8 +716,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       container.appendChild(title);
       container.appendChild(abstract);
       container.appendChild(sponsorsList);
+      container.appendChild(actionsList);
       container.appendChild(commentsList);
       container.appendChild(tagsList);
+      container.appendChild(link);
 
       const extras = container.querySelectorAll(".extra");
       for (let extra of extras) {
@@ -693,24 +731,49 @@ document.addEventListener("DOMContentLoaded", async function () {
       return container;
     };
 
-    toggleExpand = function () {
+    toggleExpand = async function () {
       if (!this.full) {
-        this.update();
+        await this.update();
       }
 
       const extras = this._element.querySelectorAll(".extra");
 
       const expandToggle = this._element.querySelector(".bill-toggle-expand");
 
+      this._element.classList.toggle("expanded");
       for (let extra of extras) {
         extra.classList.toggle("hidden");
       }
-      console.log("FLIP!");
       expandToggle.classList.toggle("flip");
     };
 
+    isFollowed = function () {
+      const bills_following_ids = [];
+      for (let bill of LGSLTR.user.bills_following) {
+        bills_following_ids.push(bill.id);
+      }
+
+      if (bills_following_ids.includes(this.id)) {
+        return true;
+      }
+
+      return false;
+    };
+
     toggleFollow = async function () {
-      const response = await axios.post(apiURL + "/follow");
+      const follow = this._element.querySelector(".bill-toggle-follow");
+      follow.classList.toggle("fa-minus-circle");
+      follow.classList.toggle("fa-plus-circle");
+
+      if (this.isFollowed()) {
+        this.deleteFromFollowing();
+      } else {
+        this.addToFollowing();
+      }
+
+      await LGSLTR.user.update();
+
+      const response = await axios.post(this.apiURL + "/follow");
       console.log(response.data);
     };
 
@@ -729,7 +792,86 @@ document.addEventListener("DOMContentLoaded", async function () {
       this.title = data.title;
       this.url = data.url;
 
-      this.console.log(data);
+      const abstract = this._element.querySelector(".bill-abstract");
+      const actions = this._element.querySelector(".bill-actions-list");
+      const comments = this._element.querySelector(".bill-comments-list");
+      const identifier = this._element.querySelector(".bill-tags-list");
+      const sponsors = this._element.querySelector(".bill-sponsors-list");
+      const tags = this._element.querySelector(".bill-tags-list");
+      const title = this._element.querySelector(".bill-title");
+      const link = this._element.querySelector(".bill-link");
+
+      abstract.textContent = "Abstract: " + this.abstract;
+      identifier.textContent = this.identifier;
+      title.textContent = this.title;
+      link.href = this.url;
+
+      actions.innerHTML = "";
+      for (let action of this.actions) {
+        const actionLI = document.createElement("li");
+        const organization = document.createElement("p");
+        organization.textContent = action.organization;
+        const description = document.createElement("p");
+        description.textContent = action.description;
+        const date = document.createElement("p");
+        date.textContent = action.date;
+        actionLI.appendChild(organization);
+        actionLI.appendChild(description);
+        actionLI.appendChild(date);
+        actions.appendChild(actionLI);
+      }
+
+      comments.innerHTML = "";
+      for (let comment of this.comments) {
+        const commentLI = document.createElement("li");
+        commentLI.classList.add("bill-comment");
+        const commentText = document.createElement("p");
+        commentText.textContent = comment.text;
+        commentText.classList.add("bill-comment-text");
+        const commentUser = document.createElement("p");
+        commentUser.textContent = comment.user;
+        commentUser.classList.add("bill-comment-user");
+        const commentLikes = document.createElement("p");
+        commentLikes.textContent = comment.likes;
+        commentLikes.classList.add("bill-comment-likes");
+        commentLI.appendChild(commentText);
+        commentLI.appendChild(commentUser);
+        commentLI.appendChild(commentLikes);
+        comments.appendChild(commentLI);
+      }
+
+      sponsors.innerHTML = "";
+      for (let sponsor of this.sponsors) {
+        const sponsorLI = document.createElement("li");
+        sponsorLI.textContent = sponsor.name;
+        sponsorLI.classList.add("bill-sponsor");
+        sponsors.appendChild(sponsorLI);
+      }
+
+      tags.innerHTML = "";
+      for (let tag of this.tags) {
+        const tagSpan = document.createElement("span");
+        tagSpan.textContent = tag.name;
+        tags.appendChild(tagSpan);
+      }
+    };
+
+    addToFollowing = function () {
+      LGSLTR.user.bills_following.push(this);
+      LGSLTR.pageBills.columns.following._element.appendChild(this.create());
+    };
+
+    deleteFromFollowing = function () {
+      const billElement = LGSLTR.pageBills.columns.following._element.querySelector(
+        `[data-id='${this.id}']`
+      );
+      billElement.remove();
+
+      this._element.innerHTML = "";
+      const index = LGSLTR.user.bills_following.indexOf(this);
+      if (index > -1) {
+        LGSLTR.user.bills_following.splice(index, 1);
+      }
     };
   }
 
@@ -760,39 +902,29 @@ document.addEventListener("DOMContentLoaded", async function () {
     LGSLTR.loadPage(page);
   });
 
-  billsPage.addEventListener("click", function (evt) {
-    const parent = evt.target.parentNode;
+  billsPage.addEventListener("click", async function (evt) {
     const target = evt.target;
-    if (target.classList.contains("flex-column-header")) {
-      parent.style.flexBasis = "100%";
-      // Needs to reference column class
-      LGSLTR.pageBills.toggleBackButtons();
-    }
+    const id = target.parentNode.dataset.id;
+    const column = target.parentNode.parentNode.id;
 
-    if (parent.classList.contains("flex-column-header")) {
-      target.parentNode.parentNode.style.flexBasis = "100%";
-      LGSLTR.pageBills.toggleBackButtons();
-    }
+    let bill = null;
+    let tag = null;
 
-    if (target.classList.contains("flex-column-back")) {
-      target.parentNode.parentNode.style.flexBasis = "32%";
-      LGSLTR.pageBills.toggleBackButtons();
+    if (column == "bills-following") {
+      bill = LGSLTR.pageBills.columns.following.items.find(
+        (bill) => bill.id == id
+      );
+      console.log(bill);
+    } else if (column == "bills-state") {
+      bill = LGSLTR.pageBills.columns.state.items.find((bill) => bill.id == id);
     }
 
     if (target.classList.contains("bill-toggle-expand")) {
-      const id = target.parentNode.dataset.id;
-      const column = target.parentNode.parentNode.id;
-      if (column == "bills-following") {
-        const bill = LGSLTR.pageBills.columns.following.items.find(
-          (bill) => bill.id == id
-        );
-        bill.toggleExpand();
-      } else if (column == "bills-state") {
-        const bill = LGSLTR.pageBills.columns.state.items.find(
-          (bill) => bill.id == id
-        );
-        bill.toggleExpand();
-      }
+      await bill.toggleExpand();
+    }
+
+    if (target.classList.contains("bill-toggle-follow")) {
+      await bill.toggleFollow();
     }
   });
 

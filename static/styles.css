@@ -160,11 +160,11 @@ div#page-content {
 
 .flex-column-item {
   /* display: grid; */
-  min-height: 200px;
+  min-height: 100px;
   margin-bottom: 0.2em;
   background-color: var(--layer1);
   border-radius: 0.2em;
-  transition: background-color 0.2s linear;
+  transition: background-color 0.2s linear, height 0.2s linear;
   text-transform: uppercase;
   font-family: "Roboto", sans-serif;
 }
@@ -201,12 +201,14 @@ div#page-content {
 #bills-state {
   overflow: scroll;
 }
-#bills-state::-webkit-scrollbar {
+#bills::-webkit-scrollbar {
   display: none;
 }
 
-#bills-state > .flex-column-item {
+#bills > .flex-column > .flex-column-item {
   overflow: hidden;
+  min-height: 100px;
+  transition: min-height var(--base-transition);
 }
 
 #bills > .flex-column {
@@ -253,7 +255,13 @@ div#page-content {
 .flex-column-item > .bill-toggle-follow:hover {
   color: white;
 }
-.flex-column-item > .bill-url {
+.flex-column-item > .bill-link {
+  position: relative;
+  bottom: 0;
+}
+
+.flex-column-item > .fa-minus-circle {
+  color: #e86a6a;
 }
 
 /* account page */
@@ -266,6 +274,11 @@ div#page-content {
 
 .hidden {
   display: none;
+}
+
+#bills > .flex-column > .flex-column-item.expanded {
+  overflow: visible;
+  min-height: auto;
 }
 
 .scaled-up {
