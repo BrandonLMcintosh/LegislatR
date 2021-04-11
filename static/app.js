@@ -294,8 +294,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     populate = async function (user) {
+      this.clear();
       const bills = user.bills_following;
-
       for (let bill of bills) {
         const abstract = bill.abstract;
         const actions = bill.actions;
@@ -447,6 +447,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     init = async function () {
+      const existingStates = this._element.querySelectorAll('.flex-column-item');
+      if(existingStates.length != 52){
       const response = await axios.get(this.apiURL);
       const states = response.data.states;
       for (let state of states) {
@@ -464,15 +466,58 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     };
   }
+}
 
-  class StatesInfo extends Column {
+  class StatesBills extends Column {
     constructor(selector, items = [], id) {
       super(selector, items);
     }
 
     init = async function () {};
 
-    populate = async function (stateID) {};
+    populate = async function (stateID) {
+      this.clear();
+      const result = await axios.get(apiURL + 'states/' + stateID + '/bills');
+      const response = result.data;
+      const billsList = response.state_bills;
+      for(let bill of billsList){
+        const id = bill.id;
+        const title = bill.title;
+        const identifier = bill.identifier;
+        const full = bill.full;
+        const abstract = bill.abstract;
+        const url = bill.url;
+        const state = bill.state;
+        const tags = bill.tags;
+        const sponsors = bill.sponsors;
+        const actions = bill.actions;
+        const comments = bill.comments;
+        const new_bill = new Bill(
+          id,
+          title,
+          identifier,
+          full,
+          abstract,
+          url,
+          state,
+          tags,
+          sponsors,
+          actions,
+          comments
+        )
+        this._element.appendChild(new_bill.create())
+        this.items.push(new_bill);
+      }
+
+    };
+
+    clear = function(){
+      this.items = [];
+      const bills = this._element.querySelectorAll('.flex-column-item');
+      for(let bill of bills){
+        bill.remove();
+      }
+    }
   }
 
   class State {
@@ -500,9 +545,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       return container;
     };
-
-    //Needs finished
-    expand() {}
   }
 
   class Bill {
@@ -641,24 +683,24 @@ document.addEventListener("DOMContentLoaded", async function () {
       return commentsDiv;
     };
 
-    createTagsList = function () {
-      const tagsDiv = document.createElement("div");
-      tagsDiv.classList.add("extra");
-      tagsDiv.classList.add("bill-tags");
-      tagsDiv.textContent = "Tags: ";
-      const tagsList = document.createElement("p");
-      tagsList.classList.add("bill-tags-list");
-      for (let tag of this.tags) {
-        const tagSpan = document.createElement("span");
-        tagSpan.textContent = tag.name;
+    // createTagsList = function () {
+    //   const tagsDiv = document.createElement("div");
+    //   tagsDiv.classList.add("extra");
+    //   tagsDiv.classList.add("bill-tags");
+    //   tagsDiv.textContent = "Tags: ";
+    //   const tagsList = document.createElement("p");
+    //   tagsList.classList.add("bill-tags-list");
+    //   for (let tag of this.tags) {
+    //     const tagSpan = document.createElement("span");
+    //     tagSpan.textContent = tag.name;
 
-        tagsList.appendChild(tagSpan);
-      }
+    //     tagsList.appendChild(tagSpan);
+    //   }
 
-      tagsDiv.appendChild(tagsList);
+    //   tagsDiv.appendChild(tagsList);
 
-      return tagsDiv;
-    };
+    //   return tagsDiv;
+    // };
 
     createExpand = function () {
       const expand = document.createElement("i");
@@ -707,7 +749,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const sponsorsList = this.createSponsorsList();
       const actionsList = this.createActionsList();
       const commentsList = this.createCommentsList();
-      const tagsList = this.createTagsList();
+      // const tagsList = this.createTagsList();
       const link = this.createLink();
 
       container.appendChild(identifier);
@@ -718,7 +760,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       container.appendChild(sponsorsList);
       container.appendChild(actionsList);
       container.appendChild(commentsList);
-      container.appendChild(tagsList);
+      // container.appendChild(tagsList);
       container.appendChild(link);
 
       const extras = container.querySelectorAll(".extra");
@@ -752,32 +794,23 @@ document.addEventListener("DOMContentLoaded", async function () {
       for (let bill of LGSLTR.user.bills_following) {
         bills_following_ids.push(bill.id);
       }
-
       if (bills_following_ids.includes(this.id)) {
         return true;
       }
-
       return false;
     };
 
     toggleFollow = async function () {
-      const follow = this._element.querySelector(".bill-toggle-follow");
-      follow.classList.toggle("fa-minus-circle");
-      follow.classList.toggle("fa-plus-circle");
-
       if (this.isFollowed()) {
+        this.makePlusButton();
         this.deleteFromFollowing();
       } else {
+        this.makeMinusButton();
         this.addToFollowing();
       }
-
-      await LGSLTR.user.update();
-
-      const response = await axios.post(this.apiURL + "/follow");
-      console.log(response.data);
+      await axios.post(this.apiURL + "/follow");
     };
 
-    // Needs edit
     update = async function (billID) {
       const response = await axios.get(this.apiURL);
       const data = response.data.bill;
@@ -795,7 +828,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const abstract = this._element.querySelector(".bill-abstract");
       const actions = this._element.querySelector(".bill-actions-list");
       const comments = this._element.querySelector(".bill-comments-list");
-      const identifier = this._element.querySelector(".bill-tags-list");
+      const identifier = this._element.querySelector(".bill-identifier");
       const sponsors = this._element.querySelector(".bill-sponsors-list");
       const tags = this._element.querySelector(".bill-tags-list");
       const title = this._element.querySelector(".bill-title");
@@ -848,30 +881,48 @@ document.addEventListener("DOMContentLoaded", async function () {
         sponsors.appendChild(sponsorLI);
       }
 
-      tags.innerHTML = "";
-      for (let tag of this.tags) {
-        const tagSpan = document.createElement("span");
-        tagSpan.textContent = tag.name;
-        tags.appendChild(tagSpan);
-      }
+      // tags.innerHTML = "";
+      // for (let tag of this.tags) {
+      //   const tagSpan = document.createElement("span");
+      //   tagSpan.textContent = tag.name;
+      //   tags.appendChild(tagSpan);
+      // }
     };
+
+    makeMinusButton = function(){
+      const billElements = document.querySelectorAll(`[data-id="${this.id}"]`);
+      for(let billElement of billElements){
+        const follow = billElement.querySelector('.bill-toggle-follow');
+        follow.classList.remove('fa-plus-circle');
+        follow.classList.add('fa-minus-circle');
+      }
+    }
+
+    makePlusButton = function(){
+      const billElements = document.querySelectorAll(`[data-id="${this.id}"]`);
+      for(let billElement of billElements){
+        const follow = billElement.querySelector('.bill-toggle-follow');
+        follow.classList.remove('fa-minus-circle');
+        follow.classList.add('fa-plus-circle');
+      }
+    }
 
     addToFollowing = function () {
       LGSLTR.user.bills_following.push(this);
+      LGSLTR.pageBills.columns.following.items.push(this);
       LGSLTR.pageBills.columns.following._element.appendChild(this.create());
     };
 
     deleteFromFollowing = function () {
-      const billElement = LGSLTR.pageBills.columns.following._element.querySelector(
+      const billFollowingElement = LGSLTR.pageBills.columns.following._element.querySelector(
         `[data-id='${this.id}']`
       );
-      billElement.remove();
 
-      this._element.innerHTML = "";
-      const index = LGSLTR.user.bills_following.indexOf(this);
-      if (index > -1) {
-        LGSLTR.user.bills_following.splice(index, 1);
-      }
+      LGSLTR.pageBills.columns.following.items = LGSLTR.pageBills.columns.following.items.filter((bill) => bill.id != this.id)
+      
+      billFollowingElement.remove();
+
+      LGSLTR.user.bills_following = LGSLTR.user.bills_following.filter((bill) => bill.id != this.id);
     };
   }
 
@@ -890,7 +941,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   bills.columns.tags = new BillsTags("bills-tags");
   const states = new PageStates("states");
   states.columns.list = new StatesList("states-list", [], "states/list");
-  states.columns.info = new StatesInfo("states-info");
+  states.columns.bills = new StatesBills("states-bills");
   const account = new PageAccounts("account");
   account.columns.login = new AccountLogin("account-login");
   account.columns.register = new AccountRegister("account-register");
@@ -914,7 +965,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       bill = LGSLTR.pageBills.columns.following.items.find(
         (bill) => bill.id == id
       );
-      console.log(bill);
     } else if (column == "bills-state") {
       bill = LGSLTR.pageBills.columns.state.items.find((bill) => bill.id == id);
     }
@@ -928,14 +978,32 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  statesPage.addEventListener("click", function (evt) {
+  statesPage.addEventListener("click", async function (evt) {
     const target = evt.target;
-    const parent = target.parentNode;
-    if (
-      target.classList.contains("flex-column-item") |
-      parent.classList.contains("flex-column-item")
-    ) {
-      document.querySelector("#states-list").style.flexBasis = "5%";
+    const column = target.parentElement.id;
+    if (column == 'states-list'){
+      const stateID = target.dataset.id;
+      await LGSLTR.pageStates.columns.bills.populate(stateID);
+      LGSLTR.pageStates.columns.list._element.style.flexBasis = '5%';
+      const backButton = LGSLTR.pageStates.columns.bills._element.querySelector('.flex-column-back')
+      backButton.classList.remove('invisible');
+    }
+
+    if(target.classList.contains('flex-column-back')){
+      LGSLTR.pageStates.columns.list._element.style.flexBasis = "100%";
+      LGSLTR.pageStates.columns.bills.clear();
+    }
+
+    if(target.classList.contains('bill-toggle-expand')){
+      const id = target.parentElement.dataset.id;
+      bill = LGSLTR.pageStates.columns.bills.items.find((bill) => bill.id == id);
+      bill.toggleExpand();
+    }
+
+    if(target.classList.contains('bill-toggle-follow')){
+      const id = target.parentElement.dataset.id;
+      bill = LGSLTR.pageStates.columns.bills.items.find((bill) => bill.id == id);
+      bill.toggleFollow();
     }
   });
 

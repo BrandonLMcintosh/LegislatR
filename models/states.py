@@ -110,7 +110,7 @@ class State(db.Model):
 
     @classmethod
     def get_all(cls):
-        states = cls.query.all()
+        states = cls.query.order_by(State.name).all()
         response = {}
         response['states'] = []
         for state in states:

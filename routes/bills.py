@@ -1,3 +1,4 @@
+from models_shared import db
 from flask import Blueprint, session, request
 from models.bills import Bill
 from models.users import User
@@ -10,7 +11,7 @@ def list():
     if User.is_logged_in():
         user = User.get(user_id=session['user_id'])
         response = {
-            'bills':user.bills_following_long_data
+            'bills':user.bills_following_data
         }
         return response
     return User.authentication_error()

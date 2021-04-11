@@ -197,8 +197,27 @@ div#page-content {
   min-height: 50px;
 }
 
+#states > #states-bills{
+  overflow: scroll;
+}
+
+#states > #states-bills::-webkit-scrollbar{
+  display: none;
+}
+
+#states > #states-bills > .flex-column-item{
+  overflow: hidden;
+}
+
 /* bills page */
+
+#bills-tags{
+  display: none;  
+}
 #bills-state {
+  overflow: scroll;
+}
+#bills-following{
   overflow: scroll;
 }
 #bills::-webkit-scrollbar {
@@ -277,6 +296,11 @@ div#page-content {
 }
 
 #bills > .flex-column > .flex-column-item.expanded {
+  overflow: visible;
+  min-height: auto;
+}
+
+#states > #states-bills > .flex-column-item.expanded{
   overflow: visible;
   min-height: auto;
 }

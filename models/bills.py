@@ -115,11 +115,36 @@ class Bill(db.Model):
 
     @ classmethod
     def get(cls, id):
-        bill = cls.query.get_or_404(id)
+        bill = cls.query.get(id)
+        if not bill:
+            cls.request_new(id)
+            return cls.get(id)
         if bill.updated:
             return bill
         bill.update()
         return bill
+    
+    @classmethod
+    def request_new(cls, id):
+        response = requests.get(request_bill.substitute(id=id))
+        bill = response.json()
+        db_created_at = bill['created_at']
+        updated_at = datetime.now()
+        session = bill['session']
+        identifier = bill['identifier']
+        title = bill['title']
+        state_id = bill['jurisdiction']['id']
+        new_bill = Bill(
+            id=id,
+            db_created_at=db_created_at,
+            updated_at=updated_at,
+            session=session,
+            identifier=identifier,
+            title=title,
+            state_id=state_id,
+        )
+        db.session.add(new_bill)
+        db.session.commit()
 
     def request(self):
         response = requests.get(request_bill.substitute(id=self.id))

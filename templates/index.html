@@ -59,17 +59,6 @@
               <a class="nav-link" href="#logout" id="nav-logout">Logout</a>
             </li>
           </ul>
-          <form class="d-flex">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-outline-light" type="submit" id="nav-search">
-              Search
-            </button>
-          </form>
         </div>
       </div>
     </nav>
@@ -88,7 +77,7 @@
             <h3>state</h3>
           </div>
         </div>
-        <div id="bills-tags" class="flex-column">
+        <div id="bills-tags" class="flex-column hidden">
           <div id="bills-tags-header" class="flex-column-header">
             <i class="fas fa-angle-left flex-column-back invisible"></i>
             <h3>tags</h3>
@@ -99,8 +88,11 @@
         <div id="states-list" class="flex-column">
           <h3 class="flex-column-header">States</h3>
         </div>
-        <div id="states-info" class="flex-column">
-          <h3 class="flex-column-header">Info</h3>
+        <div id="states-bills" class="flex-column">
+          <div class="flex-column-header">
+            <i class="fas fa-angle-left flex-column-back invisible"></i>
+            <h3>Bills</h3>
+          </div>
         </div>
       </div>
       <div id="account" class="flex-container">

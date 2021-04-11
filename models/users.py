@@ -5,7 +5,7 @@ from models.states import State
 from models.bills import Bill
 from models.tags import Tag
 from models.comments import Comment
-import json
+from models.bills_users import BillUser
 
 bcrypt = Bcrypt()
 
@@ -29,13 +29,13 @@ class User(db.Model):
     state_id = db.Column(db.Text, db.ForeignKey(
         'states.id'), nullable=False)
 
-    state = db.relationship('State', backref='users')
+    state = db.relationship('State', lazy='joined', backref='users')
 
     tags_following = db.relationship(
-        'Tag', secondary='users_tags', backref='users_following')
+        'Tag', lazy='joined', secondary='users_tags', backref='users_following')
 
     bills_following = db.relationship(
-        'Bill', secondary='bills_users', backref='users_following')
+        'Bill', lazy='joined', secondary='bills_users', backref='users_following')
 
     # messages = db.relationship(
     #     'Message', secondary='users_messages', cascade="all, delete-orphan")
@@ -43,7 +43,7 @@ class User(db.Model):
     comments = db.relationship('Comment', backref='user', cascade='all, delete-orphan')
 
     liked_comments = db.relationship(
-        'Comment', secondary='comments_likes', backref='likes')
+        'Comment', secondary='comments_likes', backref=db.backref('likes', lazy='joined'))
 
     @property
     def data(self):
@@ -147,19 +147,18 @@ class User(db.Model):
 
     def toggle_follow_bill(self, bill_id):
         result = {}
-        bill = Bill.get(bill_id)
         following_ids = []
-        for bill in self.bills_following:
-            following_ids.append(bill.id)
+        for existing_bill in self.bills_following:
+            following_ids.append(existing_bill.id)
         if bill_id in following_ids:
+            bill = Bill.get(bill_id)
             self.bills_following.remove(bill)
-            db.session.add(self)
             db.session.commit()
             result['action'] = 'unfollowed'
             result['bill'] = bill.data
             return result
+        bill = Bill.get(bill_id)
         self.bills_following.append(bill)
-        db.session.add(self)
         db.session.commit()
         result['action'] = 'followed'
         result['bill'] = bill.data
@@ -194,4 +193,3 @@ class User(db.Model):
             'error': 'you must be logged in to do this'
         }
         return result
-    

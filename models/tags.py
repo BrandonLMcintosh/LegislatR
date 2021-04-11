@@ -46,9 +46,9 @@ class Tag(db.Model):
     def get_all(cls):
         response = {}
         tags = cls.query.all()
-        response['data'] = []
+        response['tags'] = []
         for tag in tags:
-            response['data'].append(tag.data)
+            response['tags'].append(tag.data)
         return response
 
     @classmethod
