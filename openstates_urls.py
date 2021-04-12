@@ -1,9 +1,7 @@
-from boto.s3.connection import S3Connection
+from keys import openstates
 from string import Template
 from datetime import date, timedelta
 
-keys = S3Connection(os.environ['OPENSTATES_API_KEY'], os.environ['LGSLTR_SECRET_KEY'])
-print(keys)
 
 
 
