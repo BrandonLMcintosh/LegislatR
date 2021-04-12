@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiURL = "http://lgsltr.herokuapp.com/";
+  const apiURL = "https://lgsltr.herokuapp.com/";
   const billsPage = document.querySelector("#bills");
   const statesPage = document.querySelector("#states");
   const loginForm = document.querySelector("#login-form");
