@@ -20,6 +20,7 @@ Civic engagement tool to connect voters to the legislation that matters to them 
     - [twilio](https://www.twilio.com/sms) - SMS Texting API for alerts
 
 - In brief, outline your approach to creating your project (knowing that you may not know everything in advance and that these details might change later). Answer questions like the ones below, but feel free to add more information:
+
   - What does your database schema look like?
     - ![schema](https://i.imgur.com/zdm99Nw.png)
     - (NOTE: User-user messaging is not yet implemented and is an intended level of functionality at a later point in this project)
@@ -44,3 +45,19 @@ Civic engagement tool to connect voters to the legislation that matters to them 
       -Legislation with similar tags to the legislation the user is currently following (sorted by number of tag similarities in bills not already followed by a user)
   - What features make your site more than CRUD? Do you have any stretch goals?
     - This app allows levels of user engagement, which already makes it more than CRUD.
+
+- API Routes as they stand thus far:
+
+  - API URL: https://lgsltr.herokuapp.com/
+
+  - Unauthenticated routes:
+    - `/states/list`
+    - `/states/<lgsltr state_id>`
+    - `/states/<lgsltr state_id>/bills`
+    - `/user/login`
+    - `/user/logout`
+    - `/user/register`
+    - `/bills/<lgsltr bill_id>`
+  - Authenticated routes:
+    - `/user/<lgsltr user_id>/get`
+    - `/bills/<lgsltr bill_id>/follow`
