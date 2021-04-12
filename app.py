@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from models_shared import db
 from models.states import State
-import logging
+import os
 
 from keys import secret_key
 from routes.bills import bills
@@ -13,7 +13,7 @@ from routes.tags import tags
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///LGSLTR'
+app.config['SQLALCHEMY_DATABASE_URI'] = str(os.environ.get('DATABASE_URL'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_POOL_SIZE'] = 200
