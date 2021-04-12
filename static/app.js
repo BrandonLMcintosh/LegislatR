@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiURL = "http://localhost:5000/";
+  const apiURL = "http://lgsltr.herokuapp.com/";
   const billsPage = document.querySelector("#bills");
   const statesPage = document.querySelector("#states");
   const loginForm = document.querySelector("#login-form");
@@ -447,26 +447,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     init = async function () {
-      const existingStates = this._element.querySelectorAll('.flex-column-item');
-      if(existingStates.length != 52){
-      const response = await axios.get(this.apiURL);
-      const states = response.data.states;
-      for (let state of states) {
-        let new_state = new State(
-          state.id,
-          state.code,
-          state.name,
-          state.full,
-          state.url,
-          state.politicians,
-          state.bills
-        );
-        this.items.push(new_state);
-        this._element.appendChild(new_state.create());
+      const existingStates = this._element.querySelectorAll(
+        ".flex-column-item"
+      );
+      if (existingStates.length != 52) {
+        const response = await axios.get(this.apiURL);
+        const states = response.data.states;
+        for (let state of states) {
+          let new_state = new State(
+            state.id,
+            state.code,
+            state.name,
+            state.full,
+            state.url,
+            state.politicians,
+            state.bills
+          );
+          this.items.push(new_state);
+          this._element.appendChild(new_state.create());
+        }
       }
     };
   }
-}
 
   class StatesBills extends Column {
     constructor(selector, items = [], id) {
@@ -477,10 +479,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     populate = async function (stateID) {
       this.clear();
-      const result = await axios.get(apiURL + 'states/' + stateID + '/bills');
+      const result = await axios.get(apiURL + "states/" + stateID + "/bills");
       const response = result.data;
       const billsList = response.state_bills;
-      for(let bill of billsList){
+      for (let bill of billsList) {
         const id = bill.id;
         const title = bill.title;
         const identifier = bill.identifier;
@@ -504,20 +506,19 @@ document.addEventListener("DOMContentLoaded", async function () {
           sponsors,
           actions,
           comments
-        )
-        this._element.appendChild(new_bill.create())
+        );
+        this._element.appendChild(new_bill.create());
         this.items.push(new_bill);
       }
-
     };
 
-    clear = function(){
+    clear = function () {
       this.items = [];
-      const bills = this._element.querySelectorAll('.flex-column-item');
-      for(let bill of bills){
+      const bills = this._element.querySelectorAll(".flex-column-item");
+      for (let bill of bills) {
         bill.remove();
       }
-    }
+    };
   }
 
   class State {
@@ -889,23 +890,23 @@ document.addEventListener("DOMContentLoaded", async function () {
       // }
     };
 
-    makeMinusButton = function(){
+    makeMinusButton = function () {
       const billElements = document.querySelectorAll(`[data-id="${this.id}"]`);
-      for(let billElement of billElements){
-        const follow = billElement.querySelector('.bill-toggle-follow');
-        follow.classList.remove('fa-plus-circle');
-        follow.classList.add('fa-minus-circle');
+      for (let billElement of billElements) {
+        const follow = billElement.querySelector(".bill-toggle-follow");
+        follow.classList.remove("fa-plus-circle");
+        follow.classList.add("fa-minus-circle");
       }
-    }
+    };
 
-    makePlusButton = function(){
+    makePlusButton = function () {
       const billElements = document.querySelectorAll(`[data-id="${this.id}"]`);
-      for(let billElement of billElements){
-        const follow = billElement.querySelector('.bill-toggle-follow');
-        follow.classList.remove('fa-minus-circle');
-        follow.classList.add('fa-plus-circle');
+      for (let billElement of billElements) {
+        const follow = billElement.querySelector(".bill-toggle-follow");
+        follow.classList.remove("fa-minus-circle");
+        follow.classList.add("fa-plus-circle");
       }
-    }
+    };
 
     addToFollowing = function () {
       LGSLTR.user.bills_following.push(this);
@@ -918,11 +919,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         `[data-id='${this.id}']`
       );
 
-      LGSLTR.pageBills.columns.following.items = LGSLTR.pageBills.columns.following.items.filter((bill) => bill.id != this.id)
-      
+      LGSLTR.pageBills.columns.following.items = LGSLTR.pageBills.columns.following.items.filter(
+        (bill) => bill.id != this.id
+      );
+
       billFollowingElement.remove();
 
-      LGSLTR.user.bills_following = LGSLTR.user.bills_following.filter((bill) => bill.id != this.id);
+      LGSLTR.user.bills_following = LGSLTR.user.bills_following.filter(
+        (bill) => bill.id != this.id
+      );
     };
   }
 
@@ -981,28 +986,34 @@ document.addEventListener("DOMContentLoaded", async function () {
   statesPage.addEventListener("click", async function (evt) {
     const target = evt.target;
     const column = target.parentElement.id;
-    if (column == 'states-list'){
+    if (column == "states-list") {
       const stateID = target.dataset.id;
       await LGSLTR.pageStates.columns.bills.populate(stateID);
-      LGSLTR.pageStates.columns.list._element.style.flexBasis = '5%';
-      const backButton = LGSLTR.pageStates.columns.bills._element.querySelector('.flex-column-back')
-      backButton.classList.remove('invisible');
+      LGSLTR.pageStates.columns.list._element.style.flexBasis = "5%";
+      const backButton = LGSLTR.pageStates.columns.bills._element.querySelector(
+        ".flex-column-back"
+      );
+      backButton.classList.remove("invisible");
     }
 
-    if(target.classList.contains('flex-column-back')){
+    if (target.classList.contains("flex-column-back")) {
       LGSLTR.pageStates.columns.list._element.style.flexBasis = "100%";
       LGSLTR.pageStates.columns.bills.clear();
     }
 
-    if(target.classList.contains('bill-toggle-expand')){
+    if (target.classList.contains("bill-toggle-expand")) {
       const id = target.parentElement.dataset.id;
-      bill = LGSLTR.pageStates.columns.bills.items.find((bill) => bill.id == id);
+      bill = LGSLTR.pageStates.columns.bills.items.find(
+        (bill) => bill.id == id
+      );
       bill.toggleExpand();
     }
 
-    if(target.classList.contains('bill-toggle-follow')){
+    if (target.classList.contains("bill-toggle-follow")) {
       const id = target.parentElement.dataset.id;
-      bill = LGSLTR.pageStates.columns.bills.items.find((bill) => bill.id == id);
+      bill = LGSLTR.pageStates.columns.bills.items.find(
+        (bill) => bill.id == id
+      );
       bill.toggleFollow();
     }
   });
