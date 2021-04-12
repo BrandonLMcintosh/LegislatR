@@ -23,8 +23,6 @@ app.config['SECRET_KEY'] = secret_key
 db.app = app
 db.init_app(app)
 
-State.Generate_States()
-
 app.register_blueprint(bills, url_prefix="/bills")
 app.register_blueprint(users, url_prefix="/user")
 app.register_blueprint(states, url_prefix="/states")
